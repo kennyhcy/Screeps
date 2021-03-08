@@ -30,7 +30,10 @@ var sys = {
         TOWER_ROLE_CIVILIAN_ONLY: 'civilian_only',
 
         // link roles:
-        LINK_ROLE_NORMAL: 'normal',
+        LINK_ROLE_NORMAL: 'normal', // consumer site
+        LINK_ROLE_HARVEST_SITE: 'harvest_site',
+        LINK_ROLE_CENTER: 'center',
+        
     },
 
 
