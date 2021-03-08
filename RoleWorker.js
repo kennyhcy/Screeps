@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-08 22:13
+//2021-03-08 23:25
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -721,7 +721,45 @@ var roleWorker = {
 
     [CONSTS.WORKER_ROLE_TRANSFER]: {
         new: function (base, version) {
+            if (!version) {
+                version = 2;
+            }
+            var parts = [];
+            switch (version) {
+                case 1:
+                    parts = [WORK, CARRY, MOVE];
+                    break;
+                case 2:
+                    parts = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+                    break;
+                case 3:
+                    parts = [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE,];
+                    break;
+                default:
+                    version = 1;
+                    parts = [WORK, CARRY, MOVE];
+            }
 
+            //var newName = 'WE-' + version + '-' + Game.time.toString().substr(3, 8);
+            var newName = 'WT-' + version + '-' + Game.time;
+            var retCreep = base.spawnCreep(parts, newName,
+                {
+                    memory:
+                    {
+                        creepType: CONSTS.CREEP_TYPE_WORKER,
+                        role: CONSTS.WORKER_ROLE_TRANSFER,
+                        base: base.name,
+                        group: 0,
+                        working: null,
+                        working_target: null,
+                        harvest_source: null,
+                    }
+                });
+
+            //console.log('Spawning new harvester: ' + newCreep);
+            if (retCreep == 0) {
+                console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_TRANSFER, ' : ', newName);
+            }
         },
 
         run: function (creep) {
@@ -732,11 +770,141 @@ var roleWorker = {
 
     [CONSTS.WORKER_ROLE_STOREKEEPER]: {
         new: function (base, version) {
+            if (!version) {
+                version = 2;
+            }
+            var parts = [];
+            switch (version) {
+                case 1:
+                    parts = [WORK, CARRY, MOVE];
+                    break;
+                case 2:
+                    parts = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+                    break;
+                case 3:
+                    parts = [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE,];
+                    break;
+                default:
+                    version = 1;
+                    parts = [WORK, CARRY, MOVE];
+            }
 
+            //var newName = 'WE-' + version + '-' + Game.time.toString().substr(3, 8);
+            var newName = 'WS-' + version + '-' + Game.time;
+            var retCreep = base.spawnCreep(parts, newName,
+                {
+                    memory:
+                    {
+                        creepType: CONSTS.CREEP_TYPE_WORKER,
+                        role: CONSTS.WORKER_ROLE_STOREKEEPER,
+                        base: base.name,
+                        group: 0,
+                        working: null,
+                        working_target: null,
+                        harvest_source: null,
+                    }
+                });
+
+            //console.log('Spawning new harvester: ' + newCreep);
+            if (retCreep == 0) {
+                console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_STOREKEEPER, ' : ', newName);
+            }
         },
 
-        run: function (creep) {
+        run: function (icreep) {
+            var creep = Game.creeps[icreep.name];
+            var creep_base = Game.spawns[creep.memory.base];
 
+            var targets = null;
+            var target = null;
+            if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
+                creep.memory.working_target = null;
+                if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) { // 有能量，则存入Storage > container, Spawn, extension, 
+
+                    if (!targets) {
+                        targets = creep.room.find(FIND_MY_STRUCTURES, {
+                            filter: (storage) => {
+                                return (storage.structureType == STRUCTURE_SPAWN
+                                    //|| storage.structureType == STRUCTURE_CONTAINER
+                                    || storage.structureType == STRUCTURE_EXTENSION)
+                                    && storage.stock.getFreeCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+
+                    }
+                    if (!targets) {
+                        targets = creep_base.room.find(FIND_MY_STRUCTURES, {
+                            filter: (storage) => {
+                                return storage.structureType == STRUCTURE_STORAGE
+                            }
+                        });
+                    }
+
+                    if (targets) {
+                        target = targets[0];
+                        creep.memory.working = 'store';
+                        creep.memory.working_target = target.id;
+                    }
+                } else { // 无能量， 则从 LINK(role center) 中取
+
+                    targets = creep_base.room.find(FIND_MY_STRUCTURES, {
+                        filter: (center) => {
+                            return center.structureType == STRUCTURE_LINK
+                                && Memory.links[center.id].role == CONSTS.LINK_ROLE_CENTER
+                        }
+                    });
+
+                    if (targets) {
+                        target = targets[0];
+                        //console.log(target);
+                        creep.memory.working = 'get';
+                        creep.memory.working_target = target.id;
+                    }
+
+                }
+            }
+
+
+            if (creep.memory.working == 'store') {
+                target = Game.getObjectById(creep.memory.working_target);
+                if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                    && target && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+                    var ret = creep.transfer(target, RESOURCE_ENERGY);
+                    if (ret == OK || ret == ERR_BUSY) {
+                        // console.log('Check point1');
+                    } else if (ret == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target);
+                    } else {
+                        console.log('ERROR : ', creep.name, ' store fail: ', ret);
+                    }
+
+                } else {
+                    creep.memory.working = null;
+                    creep.memory.working_target = null;
+                }
+
+            } else if (creep.memory.working == 'get') {
+                target = Game.getObjectById(creep.memory.working_target);
+                // console.log(creep.memory.working_target);
+                // console.log(target);
+                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                    && target
+                    && target.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+
+                    var ret = creep.withdraw(target, RESOURCE_ENERGY);
+                    if (ret == OK || ret == ERR_BUSY) {
+                        // console.log('Check point1');
+                    } else if (ret == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target);
+                    } else {
+                        console.log('ERROR : ', creep.name, ' withdraw fail: ', ret);
+                    }
+                } else {
+                    creep.memory.working = null;
+                    creep.memory.working_target = null;
+                }
+
+            }
         },
     },
 
