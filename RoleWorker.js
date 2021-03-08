@@ -1,3 +1,6 @@
+//Role Worker
+//2021-03-08 22:13
+
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
 
@@ -207,7 +210,12 @@ var roleWorker = {
                 if (creep.store.getUsedCapacity() <= 0) { // 如果手上没有能量, 则去找能量
                     // Dropped resources
                     if (!target) {
-                        target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
+                        target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                            filter: (resource) => {
+                                return resource.room == creep.room
+                                    && resource.resourceType == RESOURCE_ENERGY
+                            }
+                        });
                         if (target) {
                             creep.memory.working = 'pickup';
                             creep.memory.working_target = target.id;
@@ -218,7 +226,8 @@ var roleWorker = {
                     if (!target) {
                         target = creep.pos.findClosestByRange(FIND_TOMBSTONES, {
                             filter: (struct) => {
-                                return struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                                return struct.room == creep.room
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
                         if (target) {
@@ -372,6 +381,7 @@ var roleWorker = {
                 //console.log('check point 348', target);
                 if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                     && target
+                    && target.resourceType == RESOURCE_ENERGY
                     && target.amount > 0) {
 
                     var ret = creep.pickup(target, RESOURCE_ENERGY);
@@ -390,7 +400,7 @@ var roleWorker = {
                 var target = Game.getObjectById(creep.memory.working_target);
                 if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                     && target
-                    && target.store.getUsedCapacity() > 0) {
+                    && target.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
 
                     var ret = creep.withdraw(target, RESOURCE_ENERGY);
                     if (ret == OK || ret == ERR_BUSY) {
@@ -555,7 +565,13 @@ var roleWorker = {
                 if (creep.store.getUsedCapacity() <= 0) { // 如果手上没有能量, 则去找能量
                     // Dropped resources
                     if (!target) {
-                        target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
+                        target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                            filter: (resource) => {
+                                return resource.room == creep.room
+                                    && resource.resourceType == RESOURCE_ENERGY
+                            }
+                        });
+
                         if (target) {
                             creep.memory.working = 'pickup';
                             creep.memory.working_target = target.id;
@@ -625,6 +641,7 @@ var roleWorker = {
                 //console.log('check point 348', target);
                 if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                     && target
+                    && target.resourceType == RESOURCE_ENERGY
                     && target.amount > 0) {
 
                     var ret = creep.pickup(target, RESOURCE_ENERGY);
@@ -639,7 +656,7 @@ var roleWorker = {
                     creep.memory.working = null;
                     creep.memory.working_target = null;
                 }
-            } 
+            }
             else if (creep.memory.working == 'withdraw') {
                 var target = Game.getObjectById(creep.memory.working_target);
                 if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
@@ -658,7 +675,7 @@ var roleWorker = {
                     creep.memory.working = null;
                     creep.memory.working_target = null;
                 }
-            } 
+            }
             else if (creep.memory.working == 'harvest') {
                 var target = Game.getObjectById(creep.memory.working_target);
                 if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
