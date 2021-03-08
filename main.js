@@ -1,4 +1,3 @@
-
 var sys = require('Sys');
 var CONSTS = require('Sys').CONSTS;
 var baseSpawn = require('BaseSpawn');
