@@ -1,1 +1,184 @@
+// Consts
+var CONSTS = require('Sys').CONSTS;
 
+// creeps:
+var roleWorker = require('RoleWorker');
+var roleSoldier = require('RoleSoldier');
+
+// Spawn run
+var baseSpawn = {
+    run: function (base) {
+        //console.log('BaseSpawn');
+        switch (Memory.spawns[base.name].role) {
+            case CONSTS.SPAWN_ROLE_NORMAL:
+                this.normal.run(base);
+                break;
+
+            case CONSTS.SPAWN_ROLE_MILITARY_FIRST:
+                this[CONSTS.SPAWN_ROLE_MILITARY_FIRST].run(base);
+                break;
+
+            case CONSTS.SPAWN_ROLE_MILITARY_ONLY:
+                this[CONSTS.SPAWN_ROLE_MILITARY_ONLY].run(base);
+                break;
+
+            case CONSTS.SPAWN_ROLE_CIVILIAN_ONLY:
+                this[CONSTS.SPAWN_ROLE_CIVILIAN_ONLY].run(base);
+                break;
+
+            default:
+                console.log('ERROR: ', base.name, ' with role ', Memory.spawns[base.name].role, ' cannot be executed!!!')
+                break;
+        }
+    },
+
+
+    [CONSTS.SPAWN_ROLE_NORMAL]: {
+        run: function (base) {
+            //console.log('Test: ', base.name, ' - ROLE ', CONSTS.SPAWN_ROLE_NORMAL,' is executed');
+
+            // ************* Workers ************* //
+            // WORKER_ROLE_HARVESTER: 'harvester',
+            // WORKER_ROLE_ENGINEER: 'engineer',
+            // WORKER_ROLE_UPGRADER: 'upgrader',
+            // WORKER_ROLE_TRANSFER: 'transfer',
+            // WORKER_ROLE_STOREKEEPER: 'storekeeper',
+            var counts_harvester = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_HARVESTER && creep.memory.base == base.name).length;
+            var counts_engineer = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_ENGINEER && creep.memory.base == base.name).length;
+            var counts_upgrader = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_UPGRADER && creep.memory.base == base.name).length;
+            var counts_transfer = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_TRANSFER && creep.memory.base == base.name).length;
+            var counts_storekeeper = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_STOREKEEPER && creep.memory.base == base.name).length;
+            var workerSetting = Memory.spawns[base.name].workerSetting;
+
+            // ************* Soldiers ************* //
+            // SOLDIER_ROLE_TANK: 'tank',
+            // SOLDIER_ROLE_COMMANDO: 'commando',
+            // SOLDIER_ROLE_SHOOTER: 'shooter',
+            // SOLDIER_ROLE_ARTILLERY: 'artillery',
+            // SOLDIER_ROLE_MEDIC: 'medic',
+            var counts_tank = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_TANK && creep.memory.base == base.name).length;
+            var counts_commando = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_COMMANDO && creep.memory.base == base.name).length;
+            var counts_shooter = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_SHOOTER && creep.memory.base == base.name).length;
+            var counts_artillery = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_ARTILLERY && creep.memory.base == base.name).length;
+            var counts_medic = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC && creep.memory.base == base.name).length;
+            var soldierSetting = Memory.spawns[base.name].soldierSetting;
+
+            if (false) { }
+            else if (counts_harvester < workerSetting[CONSTS.WORKER_ROLE_HARVESTER]) { roleWorker[CONSTS.WORKER_ROLE_HARVESTER].new(base); }
+            else if (counts_engineer < workerSetting[CONSTS.WORKER_ROLE_ENGINEER]) { roleWorker[CONSTS.WORKER_ROLE_ENGINEER].new(base); }
+            else if (counts_upgrader < workerSetting[CONSTS.WORKER_ROLE_UPGRADER]) { roleWorker[CONSTS.WORKER_ROLE_UPGRADER].new(base); }
+            else if (counts_transfer < workerSetting[CONSTS.WORKER_ROLE_TRANSFER]) { roleWorker[CONSTS.WORKER_ROLE_TRANSFER].new(base); }
+            else if (counts_storekeeper < workerSetting[CONSTS.WORKER_ROLE_STOREKEEPER]) { roleWorker[CONSTS.WORKER_ROLE_STOREKEEPER].new(base); }
+            //if (false) { }
+            else if (counts_tank < workerSetting[CONSTS.SOLDIER_ROLE_TANK]) { roleWorker[CONSTS.SOLDIER_ROLE_TANK].new(base); }
+            else if (counts_commando < workerSetting[CONSTS.SOLDIER_ROLE_COMMANDO]) { roleWorker[CONSTS.SOLDIER_ROLE_COMMANDO].new(base); }
+            else if (counts_shooter < workerSetting[CONSTS.SOLDIER_ROLE_SHOOTER]) { roleWorker[CONSTS.SOLDIER_ROLE_SHOOTER].new(base); }
+            else if (counts_artillery < workerSetting[CONSTS.SOLDIER_ROLE_ARTILLERY]) { roleWorker[CONSTS.SOLDIER_ROLE_ARTILLERY].new(base); }
+            else if (counts_medic < workerSetting[CONSTS.SOLDIER_ROLE_MEDIC]) { roleWorker[CONSTS.SOLDIER_ROLE_MEDIC].new(base); }
+
+        }
+    },
+
+
+    [CONSTS.SPAWN_ROLE_MILITARY_FIRST]: {
+        run: function (base) {
+            //console.log('Test: ', base.name, ' - ROLE ', CONSTS.SPAWN_ROLE_MILITARY_FIRST, ' is executed');
+
+            // ************* Workers ************* //
+            // WORKER_ROLE_HARVESTER: 'harvester',
+            // WORKER_ROLE_ENGINEER: 'engineer',
+            // WORKER_ROLE_UPGRADER: 'upgrader',
+            // WORKER_ROLE_TRANSFER: 'transfer',
+            // WORKER_ROLE_STOREKEEPER: 'storekeeper',
+            var counts_harvester = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_HARVESTER && creep.memory.base == base.name).length;
+            var counts_engineer = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_ENGINEER && creep.memory.base == base.name).length;
+            var counts_upgrader = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_UPGRADER && creep.memory.base == base.name).length;
+            var counts_transfer = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_TRANSFER && creep.memory.base == base.name).length;
+            var counts_storekeeper = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_STOREKEEPER && creep.memory.base == base.name).length;
+            var workerSetting = Memory.spawns[base.name].workerSetting;
+
+            // ************* Soldiers ************* //
+            // SOLDIER_ROLE_TANK: 'tank',
+            // SOLDIER_ROLE_COMMANDO: 'commando',
+            // SOLDIER_ROLE_SHOOTER: 'shooter',
+            // SOLDIER_ROLE_ARTILLERY: 'artillery',
+            // SOLDIER_ROLE_MEDIC: 'medic',
+            var counts_tank = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_TANK && creep.memory.base == base.name).length;
+            var counts_commando = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_COMMANDO && creep.memory.base == base.name).length;
+            var counts_shooter = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_SHOOTER && creep.memory.base == base.name).length;
+            var counts_artillery = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_ARTILLERY && creep.memory.base == base.name).length;
+            var counts_medic = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC && creep.memory.base == base.name).length;
+            var soldierSetting = Memory.spawns[base.name].soldierSetting;
+            
+            if (false) { }
+            else if (counts_tank < workerSetting[CONSTS.SOLDIER_ROLE_TANK]) { roleWorker[CONSTS.SOLDIER_ROLE_TANK].new(base); }
+            else if (counts_commando < workerSetting[CONSTS.SOLDIER_ROLE_COMMANDO]) { roleWorker[CONSTS.SOLDIER_ROLE_COMMANDO].new(base); }
+            else if (counts_shooter < workerSetting[CONSTS.SOLDIER_ROLE_SHOOTER]) { roleWorker[CONSTS.SOLDIER_ROLE_SHOOTER].new(base); }
+            else if (counts_artillery < workerSetting[CONSTS.SOLDIER_ROLE_ARTILLERY]) { roleWorker[CONSTS.SOLDIER_ROLE_ARTILLERY].new(base); }
+            else if (counts_medic < workerSetting[CONSTS.SOLDIER_ROLE_MEDIC]) { roleWorker[CONSTS.SOLDIER_ROLE_MEDIC].new(base); }
+            // if (false) { }
+            else if (counts_harvester < workerSetting[CONSTS.WORKER_ROLE_HARVESTER]) { roleWorker[CONSTS.WORKER_ROLE_HARVESTER].new(base); }
+            else if (counts_engineer < workerSetting[CONSTS.WORKER_ROLE_ENGINEER]) { roleWorker[CONSTS.WORKER_ROLE_ENGINEER].new(base); }
+            else if (counts_upgrader < workerSetting[CONSTS.WORKER_ROLE_UPGRADER]) { roleWorker[CONSTS.WORKER_ROLE_UPGRADER].new(base); }
+            else if (counts_transfer < workerSetting[CONSTS.WORKER_ROLE_TRANSFER]) { roleWorker[CONSTS.WORKER_ROLE_TRANSFER].new(base); }
+            else if (counts_storekeeper < workerSetting[CONSTS.WORKER_ROLE_STOREKEEPER]) { roleWorker[CONSTS.WORKER_ROLE_STOREKEEPER].new(base); }
+
+        }
+    },
+
+
+    [CONSTS.SPAWN_ROLE_MILITARY_ONLY]: {
+        run: function (base) {
+            //console.log('Test: ', base.name, ' - ROLE ', CONSTS.SPAWN_ROLE_MILITARY_ONLY, ' is executed');
+            // ************* Soldiers ************* //
+            // SOLDIER_ROLE_TANK: 'tank',
+            // SOLDIER_ROLE_COMMANDO: 'commando',
+            // SOLDIER_ROLE_SHOOTER: 'shooter',
+            // SOLDIER_ROLE_ARTILLERY: 'artillery',
+            // SOLDIER_ROLE_MEDIC: 'medic',
+            var counts_tank = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_TANK && creep.memory.base == base.name).length;
+            var counts_commando = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_COMMANDO && creep.memory.base == base.name).length;
+            var counts_shooter = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_SHOOTER && creep.memory.base == base.name).length;
+            var counts_artillery = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_ARTILLERY && creep.memory.base == base.name).length;
+            var counts_medic = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC && creep.memory.base == base.name).length;
+            var soldierSetting = Memory.spawns[base.name].soldierSetting;
+
+            if (false) { }
+            else if (counts_tank < workerSetting[CONSTS.SOLDIER_ROLE_TANK]) { roleWorker[CONSTS.SOLDIER_ROLE_TANK].new(base); }
+            else if (counts_commando < workerSetting[CONSTS.SOLDIER_ROLE_COMMANDO]) { roleWorker[CONSTS.SOLDIER_ROLE_COMMANDO].new(base); }
+            else if (counts_shooter < workerSetting[CONSTS.SOLDIER_ROLE_SHOOTER]) { roleWorker[CONSTS.SOLDIER_ROLE_SHOOTER].new(base); }
+            else if (counts_artillery < workerSetting[CONSTS.SOLDIER_ROLE_ARTILLERY]) { roleWorker[CONSTS.SOLDIER_ROLE_ARTILLERY].new(base); }
+            else if (counts_medic < workerSetting[CONSTS.SOLDIER_ROLE_MEDIC]) { roleWorker[CONSTS.SOLDIER_ROLE_MEDIC].new(base); }
+
+        }
+    },
+
+    [CONSTS.SPAWN_ROLE_CIVILIAN_ONLY]: {
+        run: function (base) {
+            //console.log('Test: ', base.name, ' - ROLE ', CONSTS.SPAWN_ROLE_CIVILIAN_ONLY, ' is executed');
+            // ************* Workers ************* //
+            // WORKER_ROLE_HARVESTER: 'harvester',
+            // WORKER_ROLE_ENGINEER: 'engineer',
+            // WORKER_ROLE_UPGRADER: 'upgrader',
+            // WORKER_ROLE_TRANSFER: 'transfer',
+            // WORKER_ROLE_STOREKEEPER: 'storekeeper',
+            var counts_harvester = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_HARVESTER && creep.memory.base == base.name).length;
+            var counts_engineer = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_ENGINEER && creep.memory.base == base.name).length;
+            var counts_upgrader = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_UPGRADER && creep.memory.base == base.name).length;
+            var counts_transfer = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_TRANSFER && creep.memory.base == base.name).length;
+            var counts_storekeeper = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.WORKER_ROLE_STOREKEEPER && creep.memory.base == base.name).length;
+            var workerSetting = Memory.spawns[base.name].workerSetting;
+
+            if (false) { }
+            else if (counts_harvester < workerSetting[CONSTS.WORKER_ROLE_HARVESTER]) { roleWorker[CONSTS.WORKER_ROLE_HARVESTER].new(base); }
+            else if (counts_engineer < workerSetting[CONSTS.WORKER_ROLE_ENGINEER]) { roleWorker[CONSTS.WORKER_ROLE_ENGINEER].new(base); }
+            else if (counts_upgrader < workerSetting[CONSTS.WORKER_ROLE_UPGRADER]) { roleWorker[CONSTS.WORKER_ROLE_UPGRADER].new(base); }
+            else if (counts_transfer < workerSetting[CONSTS.WORKER_ROLE_TRANSFER]) { roleWorker[CONSTS.WORKER_ROLE_TRANSFER].new(base); }
+            else if (counts_storekeeper < workerSetting[CONSTS.WORKER_ROLE_STOREKEEPER]) { roleWorker[CONSTS.WORKER_ROLE_STOREKEEPER].new(base); }
+
+        }
+    },
+
+}
+
+module.exports = baseSpawn;
