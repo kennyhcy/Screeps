@@ -827,7 +827,7 @@ var roleWorker = {
                                 return (storage.structureType == STRUCTURE_SPAWN
                                     //|| storage.structureType == STRUCTURE_CONTAINER
                                     || storage.structureType == STRUCTURE_EXTENSION)
-                                    && storage.stock.getFreeCapacity(RESOURCE_ENERGY) > 0
+                                    && storage.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
 
