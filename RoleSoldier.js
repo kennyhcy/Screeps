@@ -1,5 +1,6 @@
 // RoleSoldier
-// 2021-03-09 16:24
+// 2021-03-09 20:00
+
 
 var CONSTS = require('Sys').CONSTS;
 var roleSoldier = {
@@ -15,22 +16,31 @@ var roleSoldier = {
         var target = null;
 
         if (!target) {
-            target = creep.pos.findClosestByRange(FIND_FLAGS, {
-                filter: (flag) => {
+            // target = creep.pos.findClosestByRange(FIND_FLAGS, {
+            //     filter: (flag) => {
+            //         return flag.color == creep.memory.group
+            //     }
+            // });
+            var flags = _.filter(Game.flags,
+                (flag) => {
                     return flag.color == creep.memory.group
                 }
-            });
+            );
+            if (flags) {
+                target = flags[0];
+            }
 
             if (target && !creep.memory.working && creep.pos.inRangeTo(target, 3)) {
                 creep.memory.working = 'defend_pos';
-                creep.memory.working_target = target.id;
+                creep.memory.working_target = target.name;
             } else if (target && target.secondaryColor != COLOR_WHITE) {
+
                 creep.memory.working = 'attack_area';
-                creep.memory.working_target = target.id;
+                creep.memory.working_target = target.name;
             }
             else if (target && target.secondaryColor == COLOR_WHITE) {
                 creep.memory.working = 'move_pos';
-                creep.memory.working_target = target.id;
+                creep.memory.working_target = target.name;
             }
             else if (!target) {
                 creep.memory.working = 'defend_room';
@@ -41,7 +51,8 @@ var roleSoldier = {
     execute_work(creep) {
         switch (creep.memory.working) {
             case 'move_pos':
-                var flag = Game.getObjectById(creep.memory.working_target);
+                // var flag = Game.getObjectById(creep.memory.working_target);
+                var flag = Game.flags[creep.memory.working_target];
                 if (flag) {
                     var ret = creep.moveTo(flag);
                     if (ret != 0) {
@@ -53,7 +64,8 @@ var roleSoldier = {
 
             case 'attack_area':
                 var targets = [];
-                var flag = Game.getObjectById(creep.memory.working_target);
+                //var flag = Game.getObjectById(creep.memory.working_target);
+                var flag = Game.flags[creep.memory.working_target];
                 if (flag) {
                     var ret = creep.moveTo(flag);
                     if (ret != 0) {
@@ -132,7 +144,7 @@ var roleSoldier = {
                                 filter: (struc) => {
                                     return struc.structureType == STRUCTURE_WALL
                                         && (!struc.room.controller
-                                            || (struc.room.controller && struc.room.controller.my() == false))
+                                            || (struc.room.controller && struc.room.controller.my == false))
                                 }
                             });
                             if (targets.length > 0) {
@@ -174,7 +186,8 @@ var roleSoldier = {
 
             case 'defend_pos':
                 var targets = [];
-                var flag = Game.getObjectById(creep.memory.working_target);
+                // var flag = Game.getObjectById(creep.memory.working_target);
+                var flag = Game.flags[creep.memory.working_target];
                 if (flag && creep.pos.inRangeTo(flag, 3)) {
 
                     if (creep.memory.role == CONSTS.SOLDIER_ROLE_COMMANDO) {
@@ -367,7 +380,7 @@ var roleSoldier = {
                             filter: (struc) => {
                                 return struc.structureType == STRUCTURE_WALL
                                     && (!struc.room.controller
-                                        || (struc.room.controller && struc.room.controller.my() == false))
+                                        || (struc.room.controller && struc.room.controller.my == false))
                             }
                         });
                     }
