@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-09 09:32
+//2021-03-09 09:50
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -802,17 +802,18 @@ var roleWorker = {
                     }
                 } else { // 无能量， 则从 Storage > container 中取
 
-                    if (!targets) {
+                    if (!target) {
                         targets = creep_base.room.find(FIND_MY_STRUCTURES, {
                             filter: (storage) => {
                                 return storage.structureType == STRUCTURE_STORAGE
                                     || storage.structureType == STRUCTURE_CONTAINER
                             }
                         });
+                        target = targets[0];
                     }
 
-                    if (targets) {
-                        target = targets[0];
+                    if (target) {
+                        //target = targets[0];
                         //console.log(target);
                         creep.memory.working = 'get';
                         creep.memory.working_target = target.id;
