@@ -1,5 +1,5 @@
 // RoleSoldier
-// 2021-03-09 16:17
+// 2021-03-09 16:24
 
 var CONSTS = require('Sys').CONSTS;
 var roleSoldier = {
@@ -438,7 +438,7 @@ var roleSoldier = {
                         creepType: CONSTS.CREEP_TYPE_SOLDIER,
                         role: CONSTS.SOLDIER_ROLE_TANK,
                         base: base.name,
-                        group: 0,
+                        group: 1,
                         working: '',
                         working_target: null,
                         harvest_source: null,
@@ -462,17 +462,17 @@ var roleSoldier = {
             var parts = [];
             switch (version) {
                 case 1:
-                    parts = [TOUGH, MOVE];
+                    parts = [ATTACK, MOVE];
                     break;
                 case 2:
-                    parts = [TOUGH, TOUGH, MOVE, MOVE];
+                    parts = [ATTACK, ATTACK, MOVE, MOVE];
                     break;
                 case 3:
-                    parts = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE,];
+                    parts = [ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE,];
                     break;
                 default:
                     version = 1;
-                    parts = [TOUGH, MOVE];
+                    parts = [ATTACK, MOVE];
             }
 
             var newName = 'SC-' + version + '-' + Game.time;
@@ -483,7 +483,7 @@ var roleSoldier = {
                         creepType: CONSTS.CREEP_TYPE_SOLDIER,
                         role: CONSTS.SOLDIER_ROLE_COMMANDO,
                         base: base.name,
-                        group: 0,
+                        group: 1,
                         working: '',
                         working_target: null,
                         harvest_source: null,
@@ -507,17 +507,17 @@ var roleSoldier = {
             var parts = [];
             switch (version) {
                 case 1:
-                    parts = [TOUGH, MOVE];
+                    parts = [RANGED_ATTACK, MOVE];
                     break;
                 case 2:
-                    parts = [TOUGH, TOUGH, MOVE, MOVE];
+                    parts = [RANGED_ATTACK, RANGED_ATTACK, MOVE, MOVE];
                     break;
                 case 3:
-                    parts = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE,];
+                    parts = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, MOVE, MOVE, MOVE,];
                     break;
                 default:
                     version = 1;
-                    parts = [TOUGH, MOVE];
+                    parts = [RANGED_ATTACK, MOVE];
             }
 
             var newName = 'SS-' + version + '-' + Game.time;
@@ -528,7 +528,7 @@ var roleSoldier = {
                         creepType: CONSTS.CREEP_TYPE_SOLDIER,
                         role: CONSTS.SOLDIER_ROLE_SHOOTER,
                         base: base.name,
-                        group: 0,
+                        group: 1,
                         working: '',
                         working_target: null,
                         harvest_source: null,
@@ -552,17 +552,17 @@ var roleSoldier = {
             var parts = [];
             switch (version) {
                 case 1:
-                    parts = [TOUGH, MOVE];
+                    parts = [RANGED_ATTACK, MOVE];
                     break;
                 case 2:
-                    parts = [TOUGH, TOUGH, MOVE, MOVE];
+                    parts = [RANGED_ATTACK, RANGED_ATTACK, MOVE, MOVE];
                     break;
                 case 3:
-                    parts = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE,];
+                    parts = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, MOVE, MOVE, MOVE,];
                     break;
                 default:
                     version = 1;
-                    parts = [TOUGH, MOVE];
+                    parts = [RANGED_ATTACK, MOVE];
             }
 
             var newName = 'SA-' + version + '-' + Game.time;
@@ -573,7 +573,7 @@ var roleSoldier = {
                         creepType: CONSTS.CREEP_TYPE_SOLDIER,
                         role: CONSTS.SOLDIER_ROLE_ARTILLERY,
                         base: base.name,
-                        group: 0,
+                        group: 1,
                         working: '',
                         working_target: null,
                         harvest_source: null,
@@ -597,17 +597,17 @@ var roleSoldier = {
             var parts = [];
             switch (version) {
                 case 1:
-                    parts = [TOUGH, MOVE];
+                    parts = [WORK, MOVE];
                     break;
                 case 2:
-                    parts = [TOUGH, TOUGH, MOVE, MOVE];
+                    parts = [WORK, WORK, MOVE, MOVE];
                     break;
                 case 3:
-                    parts = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE,];
+                    parts = [WORK, WORK, WORK, MOVE, MOVE, MOVE,];
                     break;
                 default:
                     version = 1;
-                    parts = [TOUGH, MOVE];
+                    parts = [WORK, MOVE];
             }
 
             var newName = 'SP-' + version + '-' + Game.time;
@@ -618,7 +618,7 @@ var roleSoldier = {
                         creepType: CONSTS.CREEP_TYPE_SOLDIER,
                         role: CONSTS.SOLDIER_ROLE_SAPPER,
                         base: base.name,
-                        group: 0,
+                        group: 1,
                         working: '',
                         working_target: null,
                         harvest_source: null,
@@ -642,17 +642,17 @@ var roleSoldier = {
             var parts = [];
             switch (version) {
                 case 1:
-                    parts = [TOUGH, MOVE];
+                    parts = [HEAL, MOVE];
                     break;
                 case 2:
-                    parts = [TOUGH, TOUGH, MOVE, MOVE];
+                    parts = [HEAL, HEAL, MOVE, MOVE];
                     break;
                 case 3:
-                    parts = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE,];
+                    parts = [HEAL, HEAL, HEAL, MOVE, MOVE, MOVE,];
                     break;
                 default:
                     version = 1;
-                    parts = [TOUGH, MOVE];
+                    parts = [HEAL, MOVE];
             }
 
             var newName = 'SM-' + version + '-' + Game.time;
@@ -663,7 +663,7 @@ var roleSoldier = {
                         creepType: CONSTS.CREEP_TYPE_SOLDIER,
                         role: CONSTS.SOLDIER_ROLE_MEDIC,
                         base: base.name,
-                        group: 0,
+                        group: 1,
                         working: '',
                         working_target: null,
                         harvest_source: null,
