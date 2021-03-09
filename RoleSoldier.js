@@ -30,11 +30,11 @@ var roleSoldier = {
                 target = flags[0];
             }
 
-            if (target && !creep.memory.working && creep.pos.inRangeTo(target, 3)) {
-                creep.memory.working = 'defend_pos';
-                creep.memory.working_target = target.name;
-            } else if (target && target.secondaryColor != COLOR_WHITE) {
-
+            // if (target && !creep.memory.working && creep.pos.inRangeTo(target, 3)) {
+            //     creep.memory.working = 'defend_pos';
+            //     creep.memory.working_target = target.name;
+            // } else 
+            if (target && target.secondaryColor != COLOR_WHITE) {
                 creep.memory.working = 'attack_area';
                 creep.memory.working_target = target.name;
             }
@@ -154,7 +154,7 @@ var roleSoldier = {
                         if (target) {
                             creep.dismantle(target);
                         }
-                    }
+                    };
 
                     if (creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC) {
                         var target = null;
@@ -180,7 +180,31 @@ var roleSoldier = {
                                 creep.rangedHeal(target)
                             }
                         }
-                    }
+                    };
+
+                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
+                        var target;
+                        var ret = -99;
+                        if (!target) {
+                            if (flag.room) {
+                                var target = flag.room.controller;
+                            }
+                            if (target && creep.pos.inRangeTo(target, 3)) {
+                                creep.moveTo(target);
+                                //ret = creep.claimController(target);
+                                //console.log('claimController:', ret);
+                                if (ret != 0) {
+                                    //ret = creep.attackController(target);
+                                    //console.log('attackController:', ret);
+                                }
+                                if (ret != 0) {
+                                    ret = creep.reserveController(target);
+                                    //console.log('reserveController:', ret);
+                                }
+                            }
+                        }
+                    };
+
                 }
                 break;
 
@@ -308,7 +332,21 @@ var roleSoldier = {
                                 creep.rangedHeal(target)
                             }
                         }
-                    }
+                    };
+
+                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
+                        var target;
+                        if (!target) {
+                            var target = flag.room.controller;
+                            if (target && creep.pos.inRangeTo(target, 3)) {
+                                creep.moveTo(target);
+                                var ret = creep.claimController(target);
+                                if (ret != 0) {
+                                    var ret = creep.attackController(target);
+                                }
+                            }
+                        }
+                    };
                 }
                 else {
                     creep.memory.working = null;
@@ -368,7 +406,7 @@ var roleSoldier = {
                         }
                         creep.rangedMassAttack();
                     }
-                }
+                };
 
                 if (creep.memory.role == CONSTS.SOLDIER_ROLE_SAPPER) {
                     var target = null;
@@ -388,7 +426,7 @@ var roleSoldier = {
                         creep.moveTo(target);
                         creep.dismantle(target);
                     }
-                }
+                };
 
                 if (creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC) {
                     var target = null;
@@ -410,7 +448,21 @@ var roleSoldier = {
                             creep.rangedHeal(target);
                         }
                     }
-                }
+                };
+
+                if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
+                    var target;
+                    if (!target) {
+                        var target = flag.room.controller;
+                        if (target && creep.pos.inRangeTo(target, 3)) {
+                            creep.moveTo(target);
+                            var ret = creep.claimController(target);
+                            if (ret != 0) {
+                                var ret = creep.attackController(target);
+                            }
+                        }
+                    }
+                };
                 break;
 
             default:
@@ -689,6 +741,49 @@ var roleSoldier = {
             }
         },
 
+    },
+
+    [CONSTS.SOLDIER_ROLE_CLAIMER]: {
+        new: function (base, version) {
+            if (!version) {
+                version = 2;
+            }
+            var parts = [];
+            switch (version) {
+                case 1:
+                    parts = [CLAIM, MOVE];
+                    break;
+                case 2:
+                    parts = [CLAIM, CLAIM, MOVE, MOVE];
+                    break;
+                case 3:
+                    parts = [CLAIM, CLAIM, CLAIM, MOVE, MOVE, MOVE,];
+                    break;
+                default:
+                    version = 1;
+                    parts = [CLAIM, MOVE];
+            }
+
+            var newName = 'SCLM-' + version + '-' + Game.time;
+            var retCreep = base.spawnCreep(parts, newName,
+                {
+                    memory:
+                    {
+                        creepType: CONSTS.CREEP_TYPE_SOLDIER,
+                        role: CONSTS.SOLDIER_ROLE_CLAIMER,
+                        base: base.name,
+                        group: 1,
+                        working: '',
+                        working_target: null,
+                        harvest_source: null,
+                    }
+                });
+
+            //console.log('Spawning new harvester: ' + newCreep);
+            if (retCreep == 0) {
+                console.log('SUCCESS: Spawning new ', Game.creeps[newName].memory.role, ' : ', newName);
+            }
+        },
     },
 
 
