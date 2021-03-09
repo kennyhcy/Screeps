@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-09 09:50
+//2021-03-09 09:56
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -272,88 +272,88 @@ var roleWorker = {
                         }
                     }
 
-                    // 补充能量
-                    if (!target) {
-                        targets = creep_base.room.find(FIND_MY_STRUCTURES, {
-                            filter: (struct) => {
-                                return struct.structureType == STRUCTURE_TOWER
-                                    && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                            }
-                        });
-                        if (targets.length > 0) {
-                            target = targets[0];
-                            creep.memory.working = 'refill';
-                            creep.memory.working_target = target.id;
-                        }
-                    }
+                    // // 补充能量 WT的任务
+                    // if (!target) {
+                    //     targets = creep_base.room.find(FIND_MY_STRUCTURES, {
+                    //         filter: (struct) => {
+                    //             return struct.structureType == STRUCTURE_TOWER
+                    //                 && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                    //         }
+                    //     });
+                    //     if (targets.length > 0) {
+                    //         target = targets[0];
+                    //         creep.memory.working = 'refill';
+                    //         creep.memory.working_target = target.id;
+                    //     }
+                    // }
 
-                    // 优先修自己的建筑 n->1
-                    if (!target) {
-                        targets = creep_base.room.find(FIND_MY_STRUCTURES, {
-                            filter: (struct) => {
-                                return (struct.hits < struct.hitsMax)
-                            }
-                        });
-                        if (targets.length > 0) {
-                            target = targets[0];
-                            creep.memory.working = 'repair';
-                            creep.memory.working_target = target.id;
-                        }
-                    }
+                    // // 优先修自己的建筑 n->1 Tower的任务
+                    // if (!target) {
+                    //     targets = creep_base.room.find(FIND_MY_STRUCTURES, {
+                    //         filter: (struct) => {
+                    //             return (struct.hits < struct.hitsMax)
+                    //         }
+                    //     });
+                    //     if (targets.length > 0) {
+                    //         target = targets[0];
+                    //         creep.memory.working = 'repair';
+                    //         creep.memory.working_target = target.id;
+                    //     }
+                    // }
 
-                    //修路 1->1
-                    if (!target) {
-                        targets = creep_base.room.find(FIND_STRUCTURES, {
-                            filter: (struct) => {
-                                return (struct.structureType == STRUCTURE_ROAD
-                                    && struct.hits < struct.hitsMax)
-                            }
-                        });
-                        if (targets.length > 0) {
-                            for (var t in targets) {
-                                var tar = targets[t];
+                    // //修路 1->1 Tower的任务
+                    // if (!target) {
+                    //     targets = creep_base.room.find(FIND_STRUCTURES, {
+                    //         filter: (struct) => {
+                    //             return (struct.structureType == STRUCTURE_ROAD
+                    //                 && struct.hits < struct.hitsMax)
+                    //         }
+                    //     });
+                    //     if (targets.length > 0) {
+                    //         for (var t in targets) {
+                    //             var tar = targets[t];
 
-                                var counts = _.filter(Game.creeps, (creep) =>
-                                    creep.memory.role == CONSTS.WORKER_ROLE_ENGINEER
-                                    && creep.memory.working == 'repair'
-                                    && creep.memory.working_target == tar.id).length;
+                    //             var counts = _.filter(Game.creeps, (creep) =>
+                    //                 creep.memory.role == CONSTS.WORKER_ROLE_ENGINEER
+                    //                 && creep.memory.working == 'repair'
+                    //                 && creep.memory.working_target == tar.id).length;
 
-                                if (counts <= 0) {
-                                    target = tar;
-                                    creep.memory.working = 'repair';
-                                    creep.memory.working_target = target.id;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    //             if (counts <= 0) {
+                    //                 target = tar;
+                    //                 creep.memory.working = 'repair';
+                    //                 creep.memory.working_target = target.id;
+                    //                 break;
+                    //             }
+                    //         }
+                    //     }
+                    // }
 
-                    //修墙 1->1
-                    if (!target) {
-                        targets = creep_base.room.find(FIND_STRUCTURES, {
-                            filter: (struct) => {
-                                return (struct.structureType == STRUCTURE_WALL
-                                    && struct.hits < struct.hitsMax)
-                            }
-                        });
-                        if (targets.length > 0) {
-                            for (var t in targets) {
-                                var tar = targets[t];
+                    // //修墙 1->1 Tower的任务
+                    // if (!target) {
+                    //     targets = creep_base.room.find(FIND_STRUCTURES, {
+                    //         filter: (struct) => {
+                    //             return (struct.structureType == STRUCTURE_WALL
+                    //                 && struct.hits < struct.hitsMax)
+                    //         }
+                    //     });
+                    //     if (targets.length > 0) {
+                    //         for (var t in targets) {
+                    //             var tar = targets[t];
 
-                                var counts = _.filter(Game.creeps, (creep) =>
-                                    creep.memory.role == CONSTS.WORKER_ROLE_ENGINEER
-                                    && creep.memory.working == 'repair'
-                                    && creep.memory.working_target == tar.id).length;
+                    //             var counts = _.filter(Game.creeps, (creep) =>
+                    //                 creep.memory.role == CONSTS.WORKER_ROLE_ENGINEER
+                    //                 && creep.memory.working == 'repair'
+                    //                 && creep.memory.working_target == tar.id).length;
 
-                                if (counts <= 0) {
-                                    target = tar;
-                                    creep.memory.working = 'repair';
-                                    creep.memory.working_target = target.id;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    //             if (counts <= 0) {
+                    //                 target = tar;
+                    //                 creep.memory.working = 'repair';
+                    //                 creep.memory.working_target = target.id;
+                    //                 break;
+                    //             }
+                    //         }
+                    //     }
+                    // }
 
                     // 升级
                     if (!target) {
