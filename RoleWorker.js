@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-08 23:25
+//2021-03-09 09:00
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -763,7 +763,103 @@ var roleWorker = {
         },
 
         run: function (creep) {
+            var creep = Game.creeps[icreep.name];
+            var creep_base = Game.spawns[creep.memory.base];
 
+            var targets = null;
+            var target = null;
+            if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
+                creep.memory.working_target = null;
+                if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) { // 有能量，则存入Tower > Spawn > Extension, 
+
+                    if (!targets) {
+                        targets = creep.room.find(FIND_MY_STRUCTURES, {
+                            filter: (tower) => {
+                                return (tower.structureType == STRUCTURE_TOWER
+                                    || tower.structureType == STRUCTURE_SPAWN
+                                    || tower.structureType == STRUCTURE_EXTENSION)
+                                    && tower.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+
+                    }
+                    if (!targets) { // 放入消耗点的LINK中
+                        targets = creep_base.room.find(FIND_MY_STRUCTURES, {
+                            filter: (consumer) => {
+                                return consumer.structureType == STRUCTURE_LINK
+                                    && Memory.links[consumer.id].role == CONSTS.LINK_ROLE_NORMAL
+                                    && consumer.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                    }
+
+                    if (targets) {
+                        target = targets[0];
+                        creep.memory.working = 'refill';
+                        creep.memory.working_target = target.id;
+                    }
+                } else { // 无能量， 则从 Storage > container 中取
+
+                    if (!targets) {
+                        targets = creep_base.room.find(FIND_MY_STRUCTURES, {
+                            filter: (storage) => {
+                                return storage.structureType == STRUCTURE_STORAGE
+                                    || storage.structureType == STRUCTURE_CONTAINER
+                            }
+                        });
+                    }
+
+                    if (targets) {
+                        target = targets[0];
+                        //console.log(target);
+                        creep.memory.working = 'get';
+                        creep.memory.working_target = target.id;
+                    }
+
+                }
+            }
+
+
+            if (creep.memory.working == 'refill') {
+                target = Game.getObjectById(creep.memory.working_target);
+                if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                    && target && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+                    var ret = creep.transfer(target, RESOURCE_ENERGY);
+                    if (ret == OK || ret == ERR_BUSY) {
+                        // console.log('Check point1');
+                    } else if (ret == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target);
+                    } else {
+                        console.log('ERROR : ', creep.name, ' refill fail: ', ret);
+                    }
+
+                } else {
+                    creep.memory.working = null;
+                    creep.memory.working_target = null;
+                }
+
+            } else if (creep.memory.working == 'get') {
+                target = Game.getObjectById(creep.memory.working_target);
+                // console.log(creep.memory.working_target);
+                // console.log(target);
+                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                    && target
+                    && target.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+
+                    var ret = creep.withdraw(target, RESOURCE_ENERGY);
+                    if (ret == OK || ret == ERR_BUSY) {
+                        // console.log('Check point1');
+                    } else if (ret == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target);
+                    } else {
+                        console.log('ERROR : ', creep.name, ' get fail: ', ret);
+                    }
+                } else {
+                    creep.memory.working = null;
+                    creep.memory.working_target = null;
+                }
+
+            }
         },
     },
 
@@ -819,25 +915,26 @@ var roleWorker = {
             var target = null;
             if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
                 creep.memory.working_target = null;
-                if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) { // 有能量，则存入Storage > container, Spawn, extension, 
+                if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) { // 有能量，则存入Storage > Spawn > extension > container, 
+                    if (!targets) {
+                        targets = creep_base.room.find(FIND_MY_STRUCTURES, {
+                            filter: (storage) => {
+                                return storage.structureType == STRUCTURE_STORAGE
+                                    && storage.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                    }
 
                     if (!targets) {
                         targets = creep.room.find(FIND_MY_STRUCTURES, {
                             filter: (storage) => {
                                 return (storage.structureType == STRUCTURE_SPAWN
-                                    //|| storage.structureType == STRUCTURE_CONTAINER
-                                    || storage.structureType == STRUCTURE_EXTENSION)
+                                    || storage.structureType == STRUCTURE_EXTENSION
+                                    || storage.structureType == STRUCTURE_CONTAINER)
                                     && storage.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
 
-                    }
-                    if (!targets) {
-                        targets = creep_base.room.find(FIND_MY_STRUCTURES, {
-                            filter: (storage) => {
-                                return storage.structureType == STRUCTURE_STORAGE
-                            }
-                        });
                     }
 
                     if (targets) {
