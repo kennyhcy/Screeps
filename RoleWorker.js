@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-09 11:10
+//2021-03-09 11:20
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -234,7 +234,7 @@ var roleWorker = {
             }
         },
 
-        arrange_work: function (creep) {
+        arrange_work: function (creep) { // harvester
             //creep : Creep;
             //var creep = Game.creeps[icreep.name];
             var creep_base = Game.spawns[creep.memory.base];
@@ -332,7 +332,7 @@ var roleWorker = {
 
         },
 
-        arrange_work: function (creep) {
+        arrange_work: function (creep) { //engineer
             //var creep = Game.creeps[icreep.name];
 
             var creep_base = Game.spawns[creep.memory.base];
@@ -342,6 +342,21 @@ var roleWorker = {
                 var target = null;
 
                 if (creep.store.getUsedCapacity() <= 0) { // 如果手上没有能量, 则去找能量
+                    // container and storage
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            filter: (struct) => {
+                                return (struct.structureType == STRUCTURE_CONTAINER
+                                    || struct.structureType == STRUCTURE_STORAGE)
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+
                     // Dropped resources
                     if (!target) {
                         target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
@@ -361,21 +376,6 @@ var roleWorker = {
                         target = creep.pos.findClosestByRange(FIND_TOMBSTONES, {
                             filter: (struct) => {
                                 return struct.room == creep.room
-                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-                            }
-                        });
-                        if (target) {
-                            creep.memory.working = 'withdraw';
-                            creep.memory.working_target = target.id;
-                        }
-                    }
-
-                    // container and storage
-                    if (!target) {
-                        target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                            filter: (struct) => {
-                                return (struct.structureType == STRUCTURE_CONTAINER
-                                    || struct.structureType == STRUCTURE_STORAGE)
                                     && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
@@ -550,7 +550,7 @@ var roleWorker = {
             }
         },
 
-        arrange_work: function (creep) {
+        arrange_work: function (creep) { //upgrader
             //var creep = Game.creeps[icreep.name];
 
             var creep_base = Game.spawns[creep.memory.base];
@@ -678,7 +678,7 @@ var roleWorker = {
             }
         },
 
-        arrange_work: function (creep) {
+        arrange_work: function (creep) { // transfer
             //var creep = Game.creeps[icreep.name];
             var creep_base = Game.spawns[creep.memory.base];
 
@@ -783,7 +783,7 @@ var roleWorker = {
             }
         },
 
-        arrange_work: function (creep) {
+        arrange_work: function (creep) { // storekeeper
             //var creep = Game.creeps[icreep.name];
             var creep_base = Game.spawns[creep.memory.base];
 
