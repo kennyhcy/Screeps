@@ -20,6 +20,7 @@ var roleSoldier = {
                     return flag.color == creep.memory.group
                 }
             });
+            console.log('flag color: ',target.color, ' creep group:', creep.memory.group);
 
             if (target && !creep.memory.working && creep.pos.inRangeTo(target, 3)) {
                 creep.memory.working = 'defend_pos';
