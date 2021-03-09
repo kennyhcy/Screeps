@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-09 09:00
+//2021-03-09 09:32
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -766,13 +766,13 @@ var roleWorker = {
             var creep = Game.creeps[icreep.name];
             var creep_base = Game.spawns[creep.memory.base];
 
-            var targets = null;
+            var targets = [];
             var target = null;
             if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
                 creep.memory.working_target = null;
                 if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) { // 有能量，则存入Tower > Spawn > Extension, 
 
-                    if (!targets) {
+                    if (!target) {
                         targets = creep.room.find(FIND_MY_STRUCTURES, {
                             filter: (tower) => {
                                 return (tower.structureType == STRUCTURE_TOWER
@@ -781,9 +781,10 @@ var roleWorker = {
                                     && tower.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
+                        target = targets[0];
 
                     }
-                    if (!targets) { // 放入消耗点的LINK中
+                    if (!target) { // 放入消耗点的LINK中
                         targets = creep_base.room.find(FIND_MY_STRUCTURES, {
                             filter: (consumer) => {
                                 return consumer.structureType == STRUCTURE_LINK
@@ -791,10 +792,11 @@ var roleWorker = {
                                     && consumer.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
+                        target = targets[0];
                     }
 
-                    if (targets) {
-                        target = targets[0];
+                    if (target) {
+                        //target = targets[0];
                         creep.memory.working = 'refill';
                         creep.memory.working_target = target.id;
                     }
@@ -911,21 +913,22 @@ var roleWorker = {
             var creep = Game.creeps[icreep.name];
             var creep_base = Game.spawns[creep.memory.base];
 
-            var targets = null;
+            var targets = [];
             var target = null;
             if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
                 creep.memory.working_target = null;
                 if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) { // 有能量，则存入Storage > Spawn > extension > container, 
-                    if (!targets) {
+                    if (!target) {
                         targets = creep_base.room.find(FIND_MY_STRUCTURES, {
                             filter: (storage) => {
                                 return storage.structureType == STRUCTURE_STORAGE
                                     && storage.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
+                        target = targets[0];
                     }
 
-                    if (!targets) {
+                    if (!target) {
                         targets = creep.room.find(FIND_MY_STRUCTURES, {
                             filter: (storage) => {
                                 return (storage.structureType == STRUCTURE_SPAWN
@@ -934,11 +937,12 @@ var roleWorker = {
                                     && storage.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
+                        target = targets[0];
 
                     }
 
-                    if (targets) {
-                        target = targets[0];
+                    if (target) {
+                        //target = targets[0];
                         creep.memory.working = 'store';
                         creep.memory.working_target = target.id;
                     }
@@ -950,9 +954,10 @@ var roleWorker = {
                                 && Memory.links[center.id].role == CONSTS.LINK_ROLE_CENTER
                         }
                     });
+                    target = targets[0];
 
-                    if (targets) {
-                        target = targets[0];
+                    if (target) {
+                        //target = targets[0];
                         //console.log(target);
                         creep.memory.working = 'get';
                         creep.memory.working_target = target.id;
