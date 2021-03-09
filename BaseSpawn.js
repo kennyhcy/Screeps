@@ -1,5 +1,5 @@
-// Consts
-// 2021-03-09 08:51
+//BaseSpawn.js
+//2021-03-09 16:05
 var CONSTS = require('Sys').CONSTS;
 
 // creeps:
@@ -56,11 +56,13 @@ var baseSpawn = {
             // SOLDIER_ROLE_COMMANDO: 'commando',
             // SOLDIER_ROLE_SHOOTER: 'shooter',
             // SOLDIER_ROLE_ARTILLERY: 'artillery',
+            // SOLDIER_ROLE_SAPPER: 'sapper',
             // SOLDIER_ROLE_MEDIC: 'medic',
             var counts_tank = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_TANK && creep.memory.base == base.name).length;
             var counts_commando = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_COMMANDO && creep.memory.base == base.name).length;
             var counts_shooter = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_SHOOTER && creep.memory.base == base.name).length;
             var counts_artillery = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_ARTILLERY && creep.memory.base == base.name).length;
+            var counts_sapper = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_SAPPER && creep.memory.base == base.name).length;
             var counts_medic = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC && creep.memory.base == base.name).length;
             var soldierSetting = Memory.spawns[base.name].soldierSetting;
 
@@ -71,11 +73,12 @@ var baseSpawn = {
             else if (counts_transfer < workerSetting[CONSTS.WORKER_ROLE_TRANSFER]) { roleWorker[CONSTS.WORKER_ROLE_TRANSFER].new(base); }
             else if (counts_storekeeper < workerSetting[CONSTS.WORKER_ROLE_STOREKEEPER]) { roleWorker[CONSTS.WORKER_ROLE_STOREKEEPER].new(base); }
             //if (false) { }
-            else if (counts_tank < workerSetting[CONSTS.SOLDIER_ROLE_TANK]) { roleWorker[CONSTS.SOLDIER_ROLE_TANK].new(base); }
-            else if (counts_commando < workerSetting[CONSTS.SOLDIER_ROLE_COMMANDO]) { roleWorker[CONSTS.SOLDIER_ROLE_COMMANDO].new(base); }
-            else if (counts_shooter < workerSetting[CONSTS.SOLDIER_ROLE_SHOOTER]) { roleWorker[CONSTS.SOLDIER_ROLE_SHOOTER].new(base); }
-            else if (counts_artillery < workerSetting[CONSTS.SOLDIER_ROLE_ARTILLERY]) { roleWorker[CONSTS.SOLDIER_ROLE_ARTILLERY].new(base); }
-            else if (counts_medic < workerSetting[CONSTS.SOLDIER_ROLE_MEDIC]) { roleWorker[CONSTS.SOLDIER_ROLE_MEDIC].new(base); }
+            else if (counts_tank < soldierSetting[CONSTS.SOLDIER_ROLE_TANK]) { roleSoldier[CONSTS.SOLDIER_ROLE_TANK].new(base); }
+            else if (counts_commando < soldierSetting[CONSTS.SOLDIER_ROLE_COMMANDO]) { roleSoldier[CONSTS.SOLDIER_ROLE_COMMANDO].new(base); }
+            else if (counts_shooter < soldierSetting[CONSTS.SOLDIER_ROLE_SHOOTER]) { roleSoldier[CONSTS.SOLDIER_ROLE_SHOOTER].new(base); }
+            else if (counts_artillery < soldierSetting[CONSTS.SOLDIER_ROLE_ARTILLERY]) { roleSoldier[CONSTS.SOLDIER_ROLE_ARTILLERY].new(base); }
+            else if (counts_sapper < soldierSetting[CONSTS.SOLDIER_ROLE_SAPPER]) { roleSoldier[CONSTS.SOLDIER_ROLE_SAPPER].new(base); }
+            else if (counts_medic < soldierSetting[CONSTS.SOLDIER_ROLE_MEDIC]) { roleSoldier[CONSTS.SOLDIER_ROLE_MEDIC].new(base); }
 
         }
     },
@@ -103,20 +106,23 @@ var baseSpawn = {
             // SOLDIER_ROLE_COMMANDO: 'commando',
             // SOLDIER_ROLE_SHOOTER: 'shooter',
             // SOLDIER_ROLE_ARTILLERY: 'artillery',
+            // SOLDIER_ROLE_SAPPER: 'sapper',
             // SOLDIER_ROLE_MEDIC: 'medic',
             var counts_tank = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_TANK && creep.memory.base == base.name).length;
             var counts_commando = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_COMMANDO && creep.memory.base == base.name).length;
             var counts_shooter = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_SHOOTER && creep.memory.base == base.name).length;
             var counts_artillery = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_ARTILLERY && creep.memory.base == base.name).length;
             var counts_medic = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC && creep.memory.base == base.name).length;
+            var counts_sapper = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_SAPPER && creep.memory.base == base.name).length;
             var soldierSetting = Memory.spawns[base.name].soldierSetting;
             
             if (false) { }
-            else if (counts_tank < workerSetting[CONSTS.SOLDIER_ROLE_TANK]) { roleWorker[CONSTS.SOLDIER_ROLE_TANK].new(base); }
-            else if (counts_commando < workerSetting[CONSTS.SOLDIER_ROLE_COMMANDO]) { roleWorker[CONSTS.SOLDIER_ROLE_COMMANDO].new(base); }
-            else if (counts_shooter < workerSetting[CONSTS.SOLDIER_ROLE_SHOOTER]) { roleWorker[CONSTS.SOLDIER_ROLE_SHOOTER].new(base); }
-            else if (counts_artillery < workerSetting[CONSTS.SOLDIER_ROLE_ARTILLERY]) { roleWorker[CONSTS.SOLDIER_ROLE_ARTILLERY].new(base); }
-            else if (counts_medic < workerSetting[CONSTS.SOLDIER_ROLE_MEDIC]) { roleWorker[CONSTS.SOLDIER_ROLE_MEDIC].new(base); }
+            else if (counts_tank < soldierSetting[CONSTS.SOLDIER_ROLE_TANK]) { roleSoldier[CONSTS.SOLDIER_ROLE_TANK].new(base); }
+            else if (counts_commando < soldierSetting[CONSTS.SOLDIER_ROLE_COMMANDO]) { roleSoldier[CONSTS.SOLDIER_ROLE_COMMANDO].new(base); }
+            else if (counts_shooter < soldierSetting[CONSTS.SOLDIER_ROLE_SHOOTER]) { roleSoldier[CONSTS.SOLDIER_ROLE_SHOOTER].new(base); }
+            else if (counts_artillery < soldierSetting[CONSTS.SOLDIER_ROLE_ARTILLERY]) { roleSoldier[CONSTS.SOLDIER_ROLE_ARTILLERY].new(base); }
+            else if (counts_sapper < soldierSetting[CONSTS.SOLDIER_ROLE_SAPPER]) { roleSoldier[CONSTS.SOLDIER_ROLE_SAPPER].new(base); }
+            else if (counts_medic < soldierSetting[CONSTS.SOLDIER_ROLE_MEDIC]) { roleSoldier[CONSTS.SOLDIER_ROLE_MEDIC].new(base); }
             // if (false) { }
             else if (counts_harvester < workerSetting[CONSTS.WORKER_ROLE_HARVESTER]) { roleWorker[CONSTS.WORKER_ROLE_HARVESTER].new(base); }
             else if (counts_engineer < workerSetting[CONSTS.WORKER_ROLE_ENGINEER]) { roleWorker[CONSTS.WORKER_ROLE_ENGINEER].new(base); }
@@ -136,20 +142,23 @@ var baseSpawn = {
             // SOLDIER_ROLE_COMMANDO: 'commando',
             // SOLDIER_ROLE_SHOOTER: 'shooter',
             // SOLDIER_ROLE_ARTILLERY: 'artillery',
+            // SOLDIER_ROLE_SAPPER: 'sapper',
             // SOLDIER_ROLE_MEDIC: 'medic',
             var counts_tank = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_TANK && creep.memory.base == base.name).length;
             var counts_commando = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_COMMANDO && creep.memory.base == base.name).length;
             var counts_shooter = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_SHOOTER && creep.memory.base == base.name).length;
             var counts_artillery = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_ARTILLERY && creep.memory.base == base.name).length;
+            var counts_sapper = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_SAPPER && creep.memory.base == base.name).length;
             var counts_medic = _.filter(Game.creeps, (creep) => creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC && creep.memory.base == base.name).length;
             var soldierSetting = Memory.spawns[base.name].soldierSetting;
 
             if (false) { }
-            else if (counts_tank < workerSetting[CONSTS.SOLDIER_ROLE_TANK]) { roleWorker[CONSTS.SOLDIER_ROLE_TANK].new(base); }
-            else if (counts_commando < workerSetting[CONSTS.SOLDIER_ROLE_COMMANDO]) { roleWorker[CONSTS.SOLDIER_ROLE_COMMANDO].new(base); }
-            else if (counts_shooter < workerSetting[CONSTS.SOLDIER_ROLE_SHOOTER]) { roleWorker[CONSTS.SOLDIER_ROLE_SHOOTER].new(base); }
-            else if (counts_artillery < workerSetting[CONSTS.SOLDIER_ROLE_ARTILLERY]) { roleWorker[CONSTS.SOLDIER_ROLE_ARTILLERY].new(base); }
-            else if (counts_medic < workerSetting[CONSTS.SOLDIER_ROLE_MEDIC]) { roleWorker[CONSTS.SOLDIER_ROLE_MEDIC].new(base); }
+            else if (counts_tank < soldierSetting[CONSTS.SOLDIER_ROLE_TANK]) { roleSoldier[CONSTS.SOLDIER_ROLE_TANK].new(base); }
+            else if (counts_commando < soldierSetting[CONSTS.SOLDIER_ROLE_COMMANDO]) { roleSoldier[CONSTS.SOLDIER_ROLE_COMMANDO].new(base); }
+            else if (counts_shooter < soldierSetting[CONSTS.SOLDIER_ROLE_SHOOTER]) { roleSoldier[CONSTS.SOLDIER_ROLE_SHOOTER].new(base); }
+            else if (counts_artillery < soldierSetting[CONSTS.SOLDIER_ROLE_ARTILLERY]) { roleSoldier[CONSTS.SOLDIER_ROLE_ARTILLERY].new(base); }
+            else if (counts_sapper < soldierSetting[CONSTS.SOLDIER_ROLE_SAPPER]) { roleSoldier[CONSTS.SOLDIER_ROLE_SAPPER].new(base); }
+            else if (counts_medic < soldierSetting[CONSTS.SOLDIER_ROLE_MEDIC]) { roleSoldier[CONSTS.SOLDIER_ROLE_MEDIC].new(base); }
 
         }
     },
