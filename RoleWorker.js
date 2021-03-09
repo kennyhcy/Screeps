@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-09 11:00
+//2021-03-09 11:10
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -140,7 +140,8 @@ var roleWorker = {
                 } else {
                     console.log('ERROR : ', creep.name, ' refill fail: ', ret);
                 }
-            } else {
+            }
+            else {
                 creep.memory.working = null;
                 creep.memory.working_target = null;
             }
@@ -181,6 +182,11 @@ var roleWorker = {
                 creep.memory.working = null;
                 creep.memory.working_target = null;
             }
+        }
+        else {
+            console.log('ERROR: ', creep.name, " : no logic found for action ", creep.memory.working, " !!!");
+            creep.memory.working = null;
+            creep.memory.working_target = null;
         }
 
     },
@@ -679,6 +685,7 @@ var roleWorker = {
             var targets = [];
             var target = null;
             if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
+                creep.memory.working = null;
                 creep.memory.working_target = null;
                 if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) { // 有能量，则存入Tower > Spawn > Extension, 
 
