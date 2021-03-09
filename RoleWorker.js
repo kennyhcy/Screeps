@@ -847,5 +847,4 @@ var roleWorker = {
 
 } // end of roleWorker
 
-
 module.exports = roleWorker;
