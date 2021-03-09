@@ -1,3 +1,5 @@
+//main.js
+//2021-03-09 16:38
 var sys = require('Sys');
 var CONSTS = require('Sys').CONSTS;
 var baseSpawn = require('BaseSpawn');
@@ -29,7 +31,7 @@ module.exports.loop = function () {
         if (!creep) {
             console.log('ERROR: Creep : [', c, "] unkonwn!");
         } else if (creep.memory.creepType == CONSTS.CREEP_TYPE_SOLDIER) {
-
+            roleSoldier.run(creep);
         } else if (creep.memory.creepType == CONSTS.CREEP_TYPE_WORKER) {
             roleWorker.run(creep);
         }
