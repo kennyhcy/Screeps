@@ -1,5 +1,5 @@
 //Sys.js
-//2021-03-09 21:30
+//2021-03-09 23:00
 
 var sys = {
 
@@ -20,6 +20,7 @@ var sys = {
         SOLDIER_ROLE_SHOOTER: 'shooter',
         SOLDIER_ROLE_ARTILLERY: 'artillery',
         SOLDIER_ROLE_SAPPER: 'sapper',
+        SOLDIER_ROLE_CLAIMER: 'claimer',
         SOLDIER_ROLE_MEDIC: 'medic',
 
         // Spawn roles:
@@ -88,6 +89,7 @@ var sys = {
                     [this.CONSTS.SOLDIER_ROLE_ARTILLERY]: 0,
                     [this.CONSTS.SOLDIER_ROLE_SAPPER]: 0,
                     [this.CONSTS.SOLDIER_ROLE_MEDIC]: 0,
+                    [this.CONSTS.SOLDIER_ROLE_CLAIMER]: 0,
                 };
                 Memory.spawns[s]['role'] = this.CONSTS.SPAWN_ROLE_NORMAL;
             }
