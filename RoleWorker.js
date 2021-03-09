@@ -763,7 +763,7 @@ var roleWorker = {
         },
 
         run: function (creep) {
-            var creep = Game.creeps[icreep.name];
+            //var creep = Game.creeps[icreep.name];
             var creep_base = Game.spawns[creep.memory.base];
 
             var targets = [];
