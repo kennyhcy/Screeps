@@ -1,5 +1,5 @@
 // RoleSoldier
-// 2021-03-09 15:42
+// 2021-03-09 16:17
 
 var CONSTS = require('Sys').CONSTS;
 var roleSoldier = {
@@ -475,13 +475,13 @@ var roleSoldier = {
                     parts = [TOUGH, MOVE];
             }
 
-            var newName = 'ST-' + version + '-' + Game.time;
+            var newName = 'SC-' + version + '-' + Game.time;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
                     {
                         creepType: CONSTS.CREEP_TYPE_SOLDIER,
-                        role: CONSTS.SOLDIER_ROLE_TANK,
+                        role: CONSTS.SOLDIER_ROLE_COMMANDO,
                         base: base.name,
                         group: 0,
                         working: '',
@@ -520,13 +520,13 @@ var roleSoldier = {
                     parts = [TOUGH, MOVE];
             }
 
-            var newName = 'ST-' + version + '-' + Game.time;
+            var newName = 'SS-' + version + '-' + Game.time;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
                     {
                         creepType: CONSTS.CREEP_TYPE_SOLDIER,
-                        role: CONSTS.SOLDIER_ROLE_TANK,
+                        role: CONSTS.SOLDIER_ROLE_SHOOTER,
                         base: base.name,
                         group: 0,
                         working: '',
@@ -565,13 +565,13 @@ var roleSoldier = {
                     parts = [TOUGH, MOVE];
             }
 
-            var newName = 'ST-' + version + '-' + Game.time;
+            var newName = 'SA-' + version + '-' + Game.time;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
                     {
                         creepType: CONSTS.CREEP_TYPE_SOLDIER,
-                        role: CONSTS.SOLDIER_ROLE_TANK,
+                        role: CONSTS.SOLDIER_ROLE_ARTILLERY,
                         base: base.name,
                         group: 0,
                         working: '',
@@ -610,7 +610,7 @@ var roleSoldier = {
                     parts = [TOUGH, MOVE];
             }
 
-            var newName = 'ST-' + version + '-' + Game.time;
+            var newName = 'SP-' + version + '-' + Game.time;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
@@ -655,13 +655,13 @@ var roleSoldier = {
                     parts = [TOUGH, MOVE];
             }
 
-            var newName = 'ST-' + version + '-' + Game.time;
+            var newName = 'SM-' + version + '-' + Game.time;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
                     {
                         creepType: CONSTS.CREEP_TYPE_SOLDIER,
-                        role: CONSTS.SOLDIER_ROLE_TANK,
+                        role: CONSTS.SOLDIER_ROLE_MEDIC,
                         base: base.name,
                         group: 0,
                         working: '',
