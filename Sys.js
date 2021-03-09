@@ -1,5 +1,5 @@
 //Sys.js
-//2021-03-09 15:42
+//2021-03-09 21:30
 
 var sys = {
 
@@ -37,7 +37,7 @@ var sys = {
         LINK_ROLE_NORMAL: 'normal', // consumer site
         LINK_ROLE_HARVEST_SITE: 'harvest_site',
         LINK_ROLE_CENTER: 'center',
-        
+
     },
 
 
@@ -55,13 +55,15 @@ var sys = {
             Memory.rooms = {}
         }
         for (var r in Game.rooms) {
-            if (!Memory.rooms[r]) { // 初始化设置
-                Memory.rooms[r] = {};
-                Memory.rooms[r]['resourceSetting'] = {};
-                var sources = Game.rooms[r].find(FIND_SOURCES);
-                for (var s in sources) {
-                    var sid = sources[s].id;
-                    Memory.rooms[r]['resourceSetting'][sid] = 1; // 各个能量点允许多少creep
+            if (Game.rooms[r].controller.my) {
+                if (!Memory.rooms[r]) { // 初始化设置
+                    Memory.rooms[r] = {};
+                    Memory.rooms[r]['resourceSetting'] = {};
+                    var sources = Game.rooms[r].find(FIND_SOURCES);
+                    for (var s in sources) {
+                        var sid = sources[s].id;
+                        Memory.rooms[r]['resourceSetting'][sid] = 1; // 各个能量点允许多少creep
+                    }
                 }
             }
         };
@@ -84,6 +86,7 @@ var sys = {
                     [this.CONSTS.SOLDIER_ROLE_COMMANDO]: 0,
                     [this.CONSTS.SOLDIER_ROLE_SHOOTER]: 0,
                     [this.CONSTS.SOLDIER_ROLE_ARTILLERY]: 0,
+                    [this.CONSTS.SOLDIER_ROLE_SAPPER]: 0,
                     [this.CONSTS.SOLDIER_ROLE_MEDIC]: 0,
                 };
                 Memory.spawns[s]['role'] = this.CONSTS.SPAWN_ROLE_NORMAL;
@@ -181,10 +184,12 @@ var sys = {
         var current = {};
         for (var r in Game.rooms) {
             var room = Game.rooms[r];
-            var sources = room.find(FIND_SOURCES);
-            for (var s in sources) {
-                var source = sources[s];
-                current[source.id] = 0;
+            if (room.controller && room.controller.my) {
+                var sources = room.find(FIND_SOURCES);
+                for (var s in sources) {
+                    var source = sources[s];
+                    current[source.id] = 0;
+                }
             }
         }
 
@@ -201,9 +206,12 @@ var sys = {
         // 每个资源点最多该有几个creep
         var settings = {};
         for (var r in Game.rooms) {
-            var resourceSetting = Memory.rooms[r].resourceSetting;
-            for (var r in resourceSetting) {
-                settings[r] = resourceSetting[r];
+            var room = Game.rooms[r];
+            if (room.controller && room.controller.my) {
+                var resourceSetting = Memory.rooms[r].resourceSetting;
+                for (var r in resourceSetting) {
+                    settings[r] = resourceSetting[r];
+                }
             }
         }
 
