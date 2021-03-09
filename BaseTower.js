@@ -44,5 +44,4 @@ var baseTower = {
     }
 }
 
-
 module.exports = baseTower;
