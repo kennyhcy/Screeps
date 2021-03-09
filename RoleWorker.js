@@ -1,15 +1,188 @@
 //Role Worker
-//2021-03-09 09:56
+//2021-03-09 11:00
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
 
 var roleWorker = {
     run: function (creep) {
-        this[creep.memory.role].run(creep);
+        this[creep.memory.role].arrange_work(creep);
+        this.execute_work(creep);
         if (!creep.memory.working) {
-            this[creep.memory.role].run(creep); //第一个任务结束后下一个任务得以立即执行
+            this[creep.memory.role].arrange_work(creep); //第一个任务结束后下一个任务得以立即执行
+            this.execute_work(creep);
         }
+    },
+
+
+    execute_work: function (creep) { //执行任务: 根据 creep.memory.working 和 creep.memory.working_target
+        if (!creep.memory.working) {
+            creep.memory.working = null;
+            creep.memory.working_target = null;
+        }
+        else if (creep.memory.working == 'harvest') {
+            var target = Game.getObjectById(creep.memory.working_target);
+            if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                && target) {
+
+                var ret = creep.harvest(target);
+                if (ret == OK || ret == ERR_BUSY) {
+                    // console.log('Check point1');
+                }
+                else if (ret == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                }
+                else {
+                    console.log('ERROR : ', creep.name, ' harvest fail: ', ret);
+                }
+            } else {
+                creep.memory.working = null;
+                creep.memory.working_target = null;
+            }
+        }
+        else if (creep.memory.working == 'store') {
+            target = Game.getObjectById(creep.memory.working_target);
+            if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                && target && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+
+                var ret = creep.transfer(target, RESOURCE_ENERGY);
+                if (ret == OK || ret == ERR_BUSY) {
+                    // console.log('Check point1');
+                }
+                else if (ret == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                }
+                else {
+                    console.log('ERROR : ', creep.name, ' store fail: ', ret);
+                }
+            }
+            else {
+                creep.memory.working = null;
+                creep.memory.working_target = null;
+            }
+
+        }
+        else if (creep.memory.working == 'pickup') {
+            var target = Game.getObjectById(creep.memory.working_target);
+            //console.log('check point 348', target);
+            if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                && target
+                && target.resourceType == RESOURCE_ENERGY
+                && target.amount > 0) {
+
+                var ret = creep.pickup(target, RESOURCE_ENERGY);
+                if (ret == OK || ret == ERR_BUSY) {
+                    // console.log('Check point1');
+                }
+                else if (ret == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                }
+                else {
+                    console.log('ERROR : ', creep.name, ' pickup fail: ', ret);
+                }
+            }
+            else {
+                creep.memory.working = null;
+                creep.memory.working_target = null;
+            }
+        }
+        else if (creep.memory.working == 'withdraw') {
+            var target = Game.getObjectById(creep.memory.working_target);
+            if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                && target
+                && target.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+
+                var ret = creep.withdraw(target, RESOURCE_ENERGY);
+                if (ret == OK || ret == ERR_BUSY) {
+                    // console.log('Check point1');
+                }
+                else if (ret == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                }
+                else {
+                    console.log('ERROR : ', creep.name, ' withdraw fail: ', ret);
+                }
+            }
+            else {
+                creep.memory.working = null;
+                creep.memory.working_target = null;
+            }
+        }
+        else if (creep.memory.working == 'build') {
+            var target = Game.getObjectById(creep.memory.working_target);
+            if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                && target) {
+
+                var ret = creep.build(target);
+                if (ret == OK || ret == ERR_BUSY) {
+                    // console.log('Check point1');
+                } else if (ret == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                } else {
+                    console.log('ERROR : ', creep.name, ' build fail: ', ret);
+                }
+            } else {
+                creep.memory.working = null;
+                creep.memory.working_target = null;
+            }
+        }
+        else if (creep.memory.working == 'refill') {
+            var target = Game.getObjectById(creep.memory.working_target);
+            if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                && target
+                && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+
+                var ret = creep.transfer(target, RESOURCE_ENERGY);
+                if (ret == OK || ret == ERR_BUSY) {
+                    // console.log('Check point1');
+                } else if (ret == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                } else {
+                    console.log('ERROR : ', creep.name, ' refill fail: ', ret);
+                }
+            } else {
+                creep.memory.working = null;
+                creep.memory.working_target = null;
+            }
+        }
+        else if (creep.memory.working == 'repair') {
+            var target = Game.getObjectById(creep.memory.working_target);
+            if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                && target
+                && target.hits < target.hitsMax) {
+
+                var ret = creep.repair(target);
+                if (ret == OK || ret == ERR_BUSY) {
+                    // console.log('Check point1');
+                } else if (ret == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                } else {
+                    console.log('ERROR : ', creep.name, ' repair fail: ', ret);
+                }
+            } else {
+                creep.memory.working = null;
+                creep.memory.working_target = null;
+            }
+        }
+        else if (creep.memory.working == 'upgrade') {
+            var target = Game.getObjectById(creep.memory.working_target);
+            if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                && target) {
+
+                var ret = creep.upgradeController(target);
+                if (ret == OK || ret == ERR_BUSY) {
+                    // console.log('Check point1');
+                } else if (ret == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                } else {
+                    console.log('ERROR : ', creep.name, ' upgradeController fail: ', ret);
+                }
+            } else {
+                creep.memory.working = null;
+                creep.memory.working_target = null;
+            }
+        }
+
     },
 
     [CONSTS.WORKER_ROLE_HARVESTER]: {
@@ -55,7 +228,7 @@ var roleWorker = {
             }
         },
 
-        run: function (creep) {
+        arrange_work: function (creep) {
             //creep : Creep;
             //var creep = Game.creeps[icreep.name];
             var creep_base = Game.spawns[creep.memory.base];
@@ -76,9 +249,10 @@ var roleWorker = {
                         // 继续等待AI分配矿源                        
                     }
 
-                } else { // 如果手上有能量， 则去存储
+                }
+                else { // 如果手上有能量， 则去存储
                     //creep.memory.working = 'store';
-                    target = null;
+                    var target = null;
                     if (!target) {
                         target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
                             filter: (struc) => {
@@ -101,57 +275,11 @@ var roleWorker = {
 
                 if (!target) {
                     //console.log("Warning: ", creep.memory.role, " ", creep.name, " is free! returning base!");
-                    creep.moveTo(Game.spawns[creep.memory.base]);
+                    creep.moveTo(creep_base);
                 }
-            }
-
-            if (creep.memory.working == 'harvest') { //执行各项工作
-                var target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                    && target) { //没采满继续踩
-
-                    var ret = creep.harvest(target);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' harvest fail: ', ret);
-                    }
-                } else { //无空间， 则采矿完成
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-
-            } else if (creep.memory.working == 'store') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                //console.log('Check point -120', creep.name, ' : ', target.store.getFreeCapacity(RESOURCE_ENERGY));
-                if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-                    && target
-                    && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) { //有能量则继续输出
-
-                    var ret = creep.transfer(target, RESOURCE_ENERGY);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' store fail: ', ret);
-                    }
-                }
-
-                if (creep.store.getUsedCapacity(RESOURCE_ENERGY) <= 0
-                    || (target && target.store.getFreeCapacity(RESOURCE_ENERGY) <= 0)) { //无能量 或 目标已满， 则输出完成
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            }
-
-
-        },
-
-
-    },
+            }// end of if
+        },// end of arrange work
+    }, // end of role harverster
 
 
     [CONSTS.WORKER_ROLE_ENGINEER]: {
@@ -198,7 +326,7 @@ var roleWorker = {
 
         },
 
-        run: function (creep) {
+        arrange_work: function (creep) {
             //var creep = Game.creeps[icreep.name];
 
             var creep_base = Game.spawns[creep.memory.base];
@@ -363,152 +491,15 @@ var roleWorker = {
                         creep.memory.working_target = target.id;
 
                     }
-
-
                 }
-
                 // no work to do
                 if (!target) {
                     //console.log("Warning: ", creep.memory.role, " ", creep.name, " is free!!!");
                     creep.moveTo(Game.spawns[creep.memory.base]);
                 }
-
-            }// end of work distribute
-
-
-            if (creep.memory.working == 'pickup') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                //console.log('check point 348', target);
-                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                    && target
-                    && target.resourceType == RESOURCE_ENERGY
-                    && target.amount > 0) {
-
-                    var ret = creep.pickup(target, RESOURCE_ENERGY);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' pickup fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            } else if (creep.memory.working == 'withdraw') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                    && target
-                    && target.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-
-                    var ret = creep.withdraw(target, RESOURCE_ENERGY);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' withdraw fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            } else if (creep.memory.working == 'harvest') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                    && target) {
-
-                    var ret = creep.harvest(target);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' harvest fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            }
-            else if (creep.memory.working == 'build') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getUsedCapacity() > 0
-                    && target) {
-
-                    var ret = creep.build(target);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' build fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            }
-            else if (creep.memory.working == 'refill') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-                    && target
-                    && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
-
-                    var ret = creep.transfer(target, RESOURCE_ENERGY);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' refill fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            }
-            else if (creep.memory.working == 'repair') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getUsedCapacity() > 0
-                    && target
-                    && target.hits < target.hitsMax) {
-
-                    var ret = creep.repair(target);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' repair fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            }
-            else if (creep.memory.working == 'upgrade') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getUsedCapacity() > 0
-                    && target) {
-
-                    var ret = creep.upgradeController(target);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' upgradeController fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            }
-        },
-
-    },
+            }// end of if
+        }, // end of work arrange
+    }, // end of role engineer
 
     [CONSTS.WORKER_ROLE_UPGRADER]: {
         new: function (base, version) {
@@ -553,13 +544,13 @@ var roleWorker = {
             }
         },
 
-        run: function (icreep) {
-            var creep = Game.creeps[icreep.name];
+        arrange_work: function (creep) {
+            //var creep = Game.creeps[icreep.name];
 
             var creep_base = Game.spawns[creep.memory.base];
 
             if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
-                var targets = null;
+                //var targets = null;
                 var target = null;
 
                 if (creep.store.getUsedCapacity() <= 0) { // 如果手上没有能量, 则去找能量
@@ -630,93 +621,12 @@ var roleWorker = {
                 // no work to do
                 if (!target) {
                     //console.log("Warning: ", creep.memory.role, " ", creep.name, " is free!!!");
-                    creep.moveTo(Game.spawns[creep.memory.base]);
+                    creep.moveTo(creep_base);
                 }
 
             }// end of work distribute
-
-
-            if (creep.memory.working == 'pickup') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                //console.log('check point 348', target);
-                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                    && target
-                    && target.resourceType == RESOURCE_ENERGY
-                    && target.amount > 0) {
-
-                    var ret = creep.pickup(target, RESOURCE_ENERGY);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' pickup fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            }
-            else if (creep.memory.working == 'withdraw') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                    && target
-                    && target.store.getUsedCapacity() > 0) {
-
-                    var ret = creep.withdraw(target, RESOURCE_ENERGY);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' withdraw fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            }
-            else if (creep.memory.working == 'harvest') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                    && target) {
-
-                    var ret = creep.harvest(target);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' harvest fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            }
-            else if (creep.memory.working == 'upgrade') {
-                var target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getUsedCapacity() > 0
-                    && target) {
-
-                    var ret = creep.upgradeController(target);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' upgradeController fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-            };
-
         },// end of run
     },// end of role upgrader
-
-
 
 
     [CONSTS.WORKER_ROLE_TRANSFER]: {
@@ -762,7 +672,7 @@ var roleWorker = {
             }
         },
 
-        run: function (creep) {
+        arrange_work: function (creep) {
             //var creep = Game.creeps[icreep.name];
             var creep_base = Game.spawns[creep.memory.base];
 
@@ -781,8 +691,11 @@ var roleWorker = {
                                     && tower.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
-                        target = targets[0];
-
+                        if (targets.length > 0) {
+                            target = targets[0];
+                            creep.memory.working = 'refill';
+                            creep.memory.working_target = target.id;
+                        }
                     }
                     if (!target) { // 放入消耗点的LINK中
                         targets = creep_base.room.find(FIND_MY_STRUCTURES, {
@@ -792,15 +705,14 @@ var roleWorker = {
                                     && consumer.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
-                        target = targets[0];
+                        if (targets.length > 0) {
+                            target = targets[0];
+                            creep.memory.working = 'refill';
+                            creep.memory.working_target = target.id;
+                        }
                     }
-
-                    if (target) {
-                        //target = targets[0];
-                        creep.memory.working = 'refill';
-                        creep.memory.working_target = target.id;
-                    }
-                } else { // 无能量， 则从 Storage > container 中取
+                }
+                else { // 无能量， 则从 Storage > container 中取
 
                     if (!target) {
                         targets = creep_base.room.find(FIND_MY_STRUCTURES, {
@@ -809,62 +721,16 @@ var roleWorker = {
                                     || storage.structureType == STRUCTURE_CONTAINER
                             }
                         });
-                        target = targets[0];
+                        if (targets.length > 0) {
+                            target = targets[0];
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
                     }
-
-                    if (target) {
-                        //target = targets[0];
-                        //console.log(target);
-                        creep.memory.working = 'get';
-                        creep.memory.working_target = target.id;
-                    }
-
                 }
-            }
-
-
-            if (creep.memory.working == 'refill') {
-                target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-                    && target && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
-                    var ret = creep.transfer(target, RESOURCE_ENERGY);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' refill fail: ', ret);
-                    }
-
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-
-            } else if (creep.memory.working == 'get') {
-                target = Game.getObjectById(creep.memory.working_target);
-                // console.log(creep.memory.working_target);
-                // console.log(target);
-                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                    && target
-                    && target.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-
-                    var ret = creep.withdraw(target, RESOURCE_ENERGY);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' get fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-
-            }
-        },
-    },
+            }// end of if
+        },//end of arrange work
+    }, //end of role transfer
 
 
     [CONSTS.WORKER_ROLE_STOREKEEPER]: {
@@ -910,8 +776,8 @@ var roleWorker = {
             }
         },
 
-        run: function (icreep) {
-            var creep = Game.creeps[icreep.name];
+        arrange_work: function (creep) {
+            //var creep = Game.creeps[icreep.name];
             var creep_base = Game.spawns[creep.memory.base];
 
             var targets = [];
@@ -926,7 +792,12 @@ var roleWorker = {
                                     && storage.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
-                        target = targets[0];
+                        if (targets.length > 0) {
+                            target = targets[0];
+                            creep.memory.working = 'store';
+                            creep.memory.working_target = target.id;
+                        }
+
                     }
 
                     if (!target) {
@@ -938,15 +809,14 @@ var roleWorker = {
                                     && storage.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
-                        target = targets[0];
+                        if (targets.length > 0) {
+                            target = targets[0];
+                            creep.memory.working = 'store';
+                            creep.memory.working_target = target.id;
+                        }
 
                     }
 
-                    if (target) {
-                        //target = targets[0];
-                        creep.memory.working = 'store';
-                        creep.memory.working_target = target.id;
-                    }
                 } else { // 无能量， 则从 LINK(role center) 中取
 
                     targets = creep_base.room.find(FIND_MY_STRUCTURES, {
@@ -955,65 +825,20 @@ var roleWorker = {
                                 && Memory.links[center.id].role == CONSTS.LINK_ROLE_CENTER
                         }
                     });
-                    target = targets[0];
 
-                    if (target) {
-                        //target = targets[0];
+                    if (targets.length > 0) {
+                        target = targets[0];
                         //console.log(target);
-                        creep.memory.working = 'get';
+                        creep.memory.working = 'withdraw';
                         creep.memory.working_target = target.id;
                     }
-
-                }
-            }
-
-
-            if (creep.memory.working == 'store') {
-                target = Game.getObjectById(creep.memory.working_target);
-                if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-                    && target && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
-                    var ret = creep.transfer(target, RESOURCE_ENERGY);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' store fail: ', ret);
-                    }
-
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
                 }
 
-            } else if (creep.memory.working == 'get') {
-                target = Game.getObjectById(creep.memory.working_target);
-                // console.log(creep.memory.working_target);
-                // console.log(target);
-                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                    && target
-                    && target.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+            } // end of if
+        },//end of arrange work
+    }, // end of role storekeeper
 
-                    var ret = creep.withdraw(target, RESOURCE_ENERGY);
-                    if (ret == OK || ret == ERR_BUSY) {
-                        // console.log('Check point1');
-                    } else if (ret == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    } else {
-                        console.log('ERROR : ', creep.name, ' withdraw fail: ', ret);
-                    }
-                } else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
-                }
-
-            }
-        },
-    },
-
-
-
-}
+} // end of roleWorker
 
 
 module.exports = roleWorker;
