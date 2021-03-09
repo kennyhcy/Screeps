@@ -1,3 +1,6 @@
+//Sys.js
+//2021-03-09 15:42
+
 var sys = {
 
     CONSTS: {
@@ -16,6 +19,7 @@ var sys = {
         SOLDIER_ROLE_COMMANDO: 'commando',
         SOLDIER_ROLE_SHOOTER: 'shooter',
         SOLDIER_ROLE_ARTILLERY: 'artillery',
+        SOLDIER_ROLE_SAPPER: 'sapper',
         SOLDIER_ROLE_MEDIC: 'medic',
 
         // Spawn roles:
@@ -110,8 +114,6 @@ var sys = {
                     Memory.links[s].role = this.CONSTS.LINK_ROLE_NORMAL;
                 }
             }
-
-            
         }
     },
 
