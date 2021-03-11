@@ -1,5 +1,5 @@
 // RoleSoldier
-// 2021-03-09 20:00
+// 2021-03-11 22:30
 
 
 var CONSTS = require('Sys').CONSTS;
@@ -458,6 +458,7 @@ var roleSoldier = {
                             creep.moveTo(target);
                             var ret = creep.claimController(target);
                             if (ret != 0) {
+                                console.log('claimController: ', ret);
                                 var ret = creep.attackController(target);
                             }
                         }
@@ -507,6 +508,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
+                        working_room:base.room.name,
                     }
                 });
 
@@ -552,6 +554,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
+                        working_room:base.room.name,
                     }
                 });
 
@@ -597,6 +600,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
+                        working_room:base.room.name,
                     }
                 });
 
@@ -642,6 +646,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
+                        working_room:base.room.name,
                     }
                 });
 
@@ -687,6 +692,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
+                        working_room:base.room.name,
                     }
                 });
 
@@ -732,6 +738,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
+                        working_room:base.room.name,
                     }
                 });
 
@@ -776,6 +783,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
+                        working_room:base.room.name,
                     }
                 });
 
