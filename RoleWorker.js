@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-09 11:20
+//2021-03-11 22:30
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -225,6 +225,7 @@ var roleWorker = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
+                        working_room: base.room.name,
                     }
                 });
 
@@ -267,6 +268,7 @@ var roleWorker = {
                                     || struc.structureType == STRUCTURE_SPAWN
                                     || struc.structureType == STRUCTURE_STORAGE
                                     || struc.structureType == STRUCTURE_CONTAINER)
+                                    && struc.room.name == creep.memory.working_room
                                     && struc.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
@@ -322,6 +324,7 @@ var roleWorker = {
                         working: null,
                         working_target: null,
                         harvest_source: null,
+                        working_room: base.room.name,
                     }
                 });
 
@@ -335,7 +338,8 @@ var roleWorker = {
         arrange_work: function (creep) { //engineer
             //var creep = Game.creeps[icreep.name];
 
-            var creep_base = Game.spawns[creep.memory.base];
+            // var creep_base = Game.spawns[creep.memory.base];
+            var working_room = Game.rooms[creep.memory.working_room];
 
             if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
                 var targets = null;
@@ -385,20 +389,44 @@ var roleWorker = {
                         }
                     }
 
+                    // ruin
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_RUINS, {
+                            filter: (struct) => {
+                                return struct.room == creep.room
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+
                     // harvest
-                    // if (!target) {
-                    //     target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
-                    //     if (target) {
-                    //         creep.memory.working = 'harvest';
-                    //         creep.memory.working_target = target.id;
-                    //     }
-                    // }
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
+                        if (target) {
+                            creep.memory.working = 'harvest';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
 
                 } else { // 如果手上有能量
 
                     // 建造
+                    // if (!target) {
+                    //     targets = creep_base.room.find(FIND_MY_CONSTRUCTION_SITES);
+                    //     if (targets.length > 0) {
+                    //         target = targets[0];
+                    //         creep.memory.working = 'build';
+                    //         creep.memory.working_target = target.id;
+                    //     }
+                    // }
+                    // working_room
+                    // 建造
                     if (!target) {
-                        targets = creep_base.room.find(FIND_MY_CONSTRUCTION_SITES);
+                        targets = working_room.find(FIND_MY_CONSTRUCTION_SITES);
                         if (targets.length > 0) {
                             target = targets[0];
                             creep.memory.working = 'build';
@@ -408,7 +436,7 @@ var roleWorker = {
 
                     // // 补充能量 WT的任务
                     // if (!target) {
-                    //     targets = creep_base.room.find(FIND_MY_STRUCTURES, {
+                    //     targets = working_room.find(FIND_MY_STRUCTURES, {
                     //         filter: (struct) => {
                     //             return struct.structureType == STRUCTURE_TOWER
                     //                 && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0
@@ -423,7 +451,7 @@ var roleWorker = {
 
                     // // 优先修自己的建筑 n->1 Tower的任务
                     // if (!target) {
-                    //     targets = creep_base.room.find(FIND_MY_STRUCTURES, {
+                    //     targets = working_room.find(FIND_MY_STRUCTURES, {
                     //         filter: (struct) => {
                     //             return (struct.hits < struct.hitsMax)
                     //         }
@@ -437,7 +465,7 @@ var roleWorker = {
 
                     // //修路 1->1 Tower的任务
                     // if (!target) {
-                    //     targets = creep_base.room.find(FIND_STRUCTURES, {
+                    //     targets = working_room.find(FIND_STRUCTURES, {
                     //         filter: (struct) => {
                     //             return (struct.structureType == STRUCTURE_ROAD
                     //                 && struct.hits < struct.hitsMax)
@@ -464,7 +492,7 @@ var roleWorker = {
 
                     // //修墙 1->1 Tower的任务
                     // if (!target) {
-                    //     targets = creep_base.room.find(FIND_STRUCTURES, {
+                    //     targets = working_room.find(FIND_STRUCTURES, {
                     //         filter: (struct) => {
                     //             return (struct.structureType == STRUCTURE_WALL
                     //                 && struct.hits < struct.hitsMax)
@@ -492,7 +520,7 @@ var roleWorker = {
                     // 升级
                     if (!target) {
                         //console.log('check point', creep_base.room.controller);
-                        target = creep_base.room.controller;
+                        target = working_room.controller;
                         creep.memory.working = 'upgrade';
                         creep.memory.working_target = target.id;
 
@@ -541,6 +569,7 @@ var roleWorker = {
                         working: null,
                         working_target: null,
                         harvest_source: null,
+                        working_room: base.room.name,
                     }
                 });
 
@@ -554,6 +583,7 @@ var roleWorker = {
             //var creep = Game.creeps[icreep.name];
 
             var creep_base = Game.spawns[creep.memory.base];
+            var creep_working_room = Game.rooms[creep.memory.working_room];
 
             if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
                 //var targets = null;
@@ -603,21 +633,21 @@ var roleWorker = {
                         }
                     }
 
-                    // // harvest
-                    // if (!target) {
-                    //     target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
-                    //     if (target) {
-                    //         creep.memory.working = 'harvest';
-                    //         creep.memory.working_target = target.id;
-                    //     }
-                    // }
+                    // harvest
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
+                        if (target) {
+                            creep.memory.working = 'harvest';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
 
                 } else { // 如果手上有能量
 
                     // 升级
                     if (!target) {
                         //console.log('check point', creep_base.room.controller);
-                        target = creep_base.room.controller;
+                        target = creep_working_room.controller;
                         creep.memory.working = 'upgrade';
                         creep.memory.working_target = target.id;
 
@@ -669,6 +699,7 @@ var roleWorker = {
                         working: null,
                         working_target: null,
                         harvest_source: null,
+                        working_room: base.room.name,
                     }
                 });
 
@@ -774,6 +805,7 @@ var roleWorker = {
                         working: null,
                         working_target: null,
                         harvest_source: null,
+                        working_room: base.room.name,
                     }
                 });
 
