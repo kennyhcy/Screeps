@@ -1,5 +1,5 @@
 //Sys.js
-//2021-03-09 23:00
+//2021-03-09 22:30
 
 var sys = {
 
@@ -63,7 +63,7 @@ var sys = {
                     var sources = Game.rooms[r].find(FIND_SOURCES);
                     for (var s in sources) {
                         var sid = sources[s].id;
-                        Memory.rooms[r]['resourceSetting'][sid] = 1; // 各个能量点允许多少creep
+                        Memory.rooms[r]['resourceSetting'][sid] = 0; // 各个能量点允许多少creep
                     }
                 }
             }
@@ -76,7 +76,7 @@ var sys = {
             if (!Memory.spawns[s]) {
                 Memory.spawns[s] = {};
                 Memory.spawns[s]['workerSetting'] = {
-                    [this.CONSTS.WORKER_ROLE_HARVESTER]: 1,
+                    [this.CONSTS.WORKER_ROLE_HARVESTER]: 0,
                     [this.CONSTS.WORKER_ROLE_ENGINEER]: 0,
                     [this.CONSTS.WORKER_ROLE_UPGRADER]: 0,
                     [this.CONSTS.WORKER_ROLE_TRANSFER]: 0,
@@ -242,9 +242,12 @@ var sys = {
 
             if (sett > curr) { // 资源点creep小于设置的， 找空目标的creep分配过来, 一个就行， 反正要循环嘛
 
+                var source_room = Game.getObjectById(c).room;
+
                 var tcreeps = _.filter(Game.creeps, (creep) =>
                     creep.memory.role == this.CONSTS.WORKER_ROLE_HARVESTER
                     && !creep.memory.harvest_source
+                    && creep.memory.working_room == source_room.name
                 );
 
                 if (tcreeps.length > 0) {
