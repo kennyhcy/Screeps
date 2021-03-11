@@ -28,6 +28,9 @@ module.exports.loop = function () {
 
     for (var c in Game.creeps) {
         var creep = Game.creeps[c];
+        // if (!creep.memory.working_room) {
+        //     creep.memory.working_room = creep.room.name;
+        // }
         if (!creep) {
             console.log('ERROR: Creep : [', c, "] unkonwn!");
         } else if (creep.memory.creepType == CONSTS.CREEP_TYPE_SOLDIER) {
