@@ -14,6 +14,15 @@ var roleSoldier = {
     },
     arrange_work(creep) {
         var target = null;
+        var secGroup = {
+            [CONSTS.SOLDIER_ROLE_TANK]: COLOR_PURPLE, // 2,
+            [CONSTS.SOLDIER_ROLE_COMMANDO]: COLOR_BLUE,// 3,
+            [CONSTS.SOLDIER_ROLE_SHOOTER]: COLOR_CYAN, //4,
+            [CONSTS.SOLDIER_ROLE_ARTILLERY]: COLOR_GREEN, //5,
+            [CONSTS.SOLDIER_ROLE_SAPPER]: COLOR_YELLOW, //6,
+            [CONSTS.SOLDIER_ROLE_CLAIMER]: COLOR_ORANGE, //7,
+            [CONSTS.SOLDIER_ROLE_MEDIC]: COLOR_BROWN, //8,
+        };
 
         if (!target) {
             // target = creep.pos.findClosestByRange(FIND_FLAGS, {
@@ -21,13 +30,28 @@ var roleSoldier = {
             //         return flag.color == creep.memory.group
             //     }
             // });
-            var flags = _.filter(Game.flags,
-                (flag) => {
-                    return flag.color == creep.memory.group
+            if (!target) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == secGroup[creep.memory.role]
+                    }
+                );
+                if (flags.length > 0) {
+                    target = flags[0];
                 }
-            );
-            if (flags) {
-                target = flags[0];
+            }
+
+            if (!target) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == COLOR_RED
+                    }
+                );
+                if (flags.length > 0) {
+                    target = flags[0];
+                }
             }
 
             // if (target && !creep.memory.working && creep.pos.inRangeTo(target, 3)) {
@@ -194,7 +218,7 @@ var roleSoldier = {
                                 //ret = creep.claimController(target);
                                 //console.log('claimController:', ret);
                                 if (ret != 0) {
-                                    //ret = creep.attackController(target);
+                                    ret = creep.attackController(target);
                                     //console.log('attackController:', ret);
                                 }
                                 if (ret != 0) {
@@ -458,7 +482,7 @@ var roleSoldier = {
                             creep.moveTo(target);
                             var ret = creep.claimController(target);
                             if (ret != 0) {
-                                console.log('claimController: ', ret);
+                                //console.log('claimController: ', ret);
                                 var ret = creep.attackController(target);
                             }
                         }
@@ -477,9 +501,6 @@ var roleSoldier = {
     [CONSTS.SOLDIER_ROLE_TANK]:
     {
         new: function (base, version) {
-            if (!version) {
-                version = 2;
-            }
             var parts = [];
             switch (version) {
                 case 1:
@@ -508,7 +529,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
-                        working_room:base.room.name,
+                        working_room: base.room.name,
                     }
                 });
 
@@ -523,9 +544,6 @@ var roleSoldier = {
     [CONSTS.SOLDIER_ROLE_COMMANDO]:
     {
         new: function (base, version) {
-            if (!version) {
-                version = 2;
-            }
             var parts = [];
             switch (version) {
                 case 1:
@@ -554,7 +572,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
-                        working_room:base.room.name,
+                        working_room: base.room.name,
                     }
                 });
 
@@ -569,9 +587,6 @@ var roleSoldier = {
     [CONSTS.SOLDIER_ROLE_SHOOTER]:
     {
         new: function (base, version) {
-            if (!version) {
-                version = 2;
-            }
             var parts = [];
             switch (version) {
                 case 1:
@@ -600,7 +615,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
-                        working_room:base.room.name,
+                        working_room: base.room.name,
                     }
                 });
 
@@ -615,9 +630,6 @@ var roleSoldier = {
     [CONSTS.SOLDIER_ROLE_ARTILLERY]:
     {
         new: function (base, version) {
-            if (!version) {
-                version = 2;
-            }
             var parts = [];
             switch (version) {
                 case 1:
@@ -646,7 +658,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
-                        working_room:base.room.name,
+                        working_room: base.room.name,
                     }
                 });
 
@@ -661,9 +673,6 @@ var roleSoldier = {
     [CONSTS.SOLDIER_ROLE_SAPPER]:
     {
         new: function (base, version) {
-            if (!version) {
-                version = 2;
-            }
             var parts = [];
             switch (version) {
                 case 1:
@@ -692,7 +701,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
-                        working_room:base.room.name,
+                        working_room: base.room.name,
                     }
                 });
 
@@ -707,9 +716,6 @@ var roleSoldier = {
     [CONSTS.SOLDIER_ROLE_MEDIC]:
     {
         new: function (base, version) {
-            if (!version) {
-                version = 2;
-            }
             var parts = [];
             switch (version) {
                 case 1:
@@ -738,7 +744,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
-                        working_room:base.room.name,
+                        working_room: base.room.name,
                     }
                 });
 
@@ -752,9 +758,6 @@ var roleSoldier = {
 
     [CONSTS.SOLDIER_ROLE_CLAIMER]: {
         new: function (base, version) {
-            if (!version) {
-                version = 2;
-            }
             var parts = [];
             switch (version) {
                 case 1:
@@ -783,7 +786,7 @@ var roleSoldier = {
                         working: '',
                         working_target: null,
                         harvest_source: null,
-                        working_room:base.room.name,
+                        working_room: base.room.name,
                     }
                 });
 
