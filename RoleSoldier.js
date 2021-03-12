@@ -1,5 +1,5 @@
 // RoleSoldier
-// 2021-03-11 22:30
+// 2021-03-12 16:00
 
 
 var CONSTS = require('Sys').CONSTS;
@@ -209,174 +209,180 @@ var roleSoldier = {
                     if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
                         var target;
                         var ret = -99;
-                        if (!target) {
-                            if (flag.room) {
-                                var target = flag.room.controller;
-                            }
-                            if (target && creep.pos.inRangeTo(target, 3)) {
-                                creep.moveTo(target);
-                                //ret = creep.claimController(target);
-                                //console.log('claimController:', ret);
-                                if (ret != 0) {
-                                    ret = creep.attackController(target);
-                                    //console.log('attackController:', ret);
-                                }
-                                if (ret != 0) {
-                                    ret = creep.reserveController(target);
-                                    //console.log('reserveController:', ret);
-                                }
-                            }
-                        }
-                    };
-
-                }
-                break;
-
-            case 'defend_pos':
-                var targets = [];
-                // var flag = Game.getObjectById(creep.memory.working_target);
-                var flag = Game.flags[creep.memory.working_target];
-                if (flag && creep.pos.inRangeTo(flag, 3)) {
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_COMMANDO) {
-                        var target = null;
-                        if (!target) {
-                            var targets = flag.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (!target) {
-                            var targets = flag.pos.findInRange(FIND_HOSTILE_STRUCTURES, 3);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-
-                        if (target) {
-                            creep.moveTo(target);
-                            creep.attack(target);
-                        }
-                    }
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_SHOOTER) {
-                        var target = null;
-                        if (!target) {
-                            var targets = flag.pos.findInRange(FIND_HOSTILE_CREEPS, 6);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (!target) {
-                            var targets = flag.pos.findInRange(FIND_HOSTILE_STRUCTURES, 6);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (target) {
-                            if (!creep.pos.inRangeTo(target, 3)) {
-                                creep.moveTo(target);
-                            }
-                            creep.rangedAttack(target);
-                        }
-                    }
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_ARTILLERY) {
-                        var target = null;
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 6);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (target) {
-                            if (!creep.pos.inRangeTo(target, 3)) {
-                                creep.moveTo(target);
-                            }
-                            creep.rangedMassAttack();
-                        }
-                    }
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_SAPPER) {
-                        var target = null;
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 3);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_STRUCTURES, 3, {
-                                filter: (struc) => {
-                                    return struc.structureType == STRUCTURE_WALL
-                                        && (!struc.room.controller
-                                            || (struc.room.controller && struc.room.controller.my() == false))
-                                }
-                            });
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (target) {
-                            creep.moveTo(target);
-                            creep.dismantle(target);
-                        }
-                    }
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC) {
-                        var target = null;
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_MY_CREEPS, 1, {
-                                filter: (homie) => {
-                                    return homie.hits < homie.hitsMax
-                                }
-                            });
-                            if (targets.length > 0) {
-                                target = targets[0];
-                                creep.heal(target)
-                            }
-                        }
-                        if (!target) {
-                            var targets = flag.pos.findInRange(FIND_MY_CREEPS, 6, {
-                                filter: (homie) => {
-                                    return homie.hits < homie.hitsMax
-                                }
-                            });
-                            if (targets.length > 0) {
-                                target = targets[0];
-                                if (!creep.pos.inRangeTo(target, 3)) {
-                                    creep.moveTo(target);
-                                }
-                                creep.rangedHeal(target)
-                            }
-                        }
-                    };
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
-                        var target;
-                        if (!target) {
+                        if (flag.room) {
                             var target = flag.room.controller;
-                            if (target && creep.pos.inRangeTo(target, 3)) {
-                                creep.moveTo(target);
-                                var ret = creep.claimController(target);
-                                if (ret != 0) {
-                                    var ret = creep.attackController(target);
-                                }
+                        }
+                        if (target && creep.pos.inRangeTo(target, 3)) {
+                            creep.moveTo(target);
+                            // claimer_action
+                            if (ret != 0 && creep.claimer_action == 'claim') {
+                                ret = creep.claimController(target);
+                                //console.log('claimController:', ret);
+                            }
+                            if (ret != 0 && creep.claimer_action == 'attack') {
+                                ret = creep.attackController(target);
+                                //console.log('attackController:', ret);
+                            }
+                            if (ret != 0 && creep.claimer_action == 'reserve') {
+                                ret = creep.reserveController(target);
+                                //console.log('reserveController:', ret);
+                            }
+                            if (ret != 0 && creep.claimer_action == 'sign') {
+                                ret = creep.signController(target, creep.memory.claimer_sign_text);
+                                creep.say(creep.memory.claimer_sign_text);
+                                creep.claimer_action == null;
                             }
                         }
                     };
-                }
-                else {
-                    creep.memory.working = null;
-                    creep.memory.working_target = null;
+
                 }
                 break;
+
+            // case 'defend_pos':
+            //     var targets = [];
+            //     // var flag = Game.getObjectById(creep.memory.working_target);
+            //     var flag = Game.flags[creep.memory.working_target];
+            //     if (flag && creep.pos.inRangeTo(flag, 3)) {
+
+            //         if (creep.memory.role == CONSTS.SOLDIER_ROLE_COMMANDO) {
+            //             var target = null;
+            //             if (!target) {
+            //                 var targets = flag.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
+            //                 if (targets.length > 0) {
+            //                     target = targets[0];
+            //                 }
+            //             }
+            //             if (!target) {
+            //                 var targets = flag.pos.findInRange(FIND_HOSTILE_STRUCTURES, 3);
+            //                 if (targets.length > 0) {
+            //                     target = targets[0];
+            //                 }
+            //             }
+
+            //             if (target) {
+            //                 creep.moveTo(target);
+            //                 creep.attack(target);
+            //             }
+            //         }
+
+            //         if (creep.memory.role == CONSTS.SOLDIER_ROLE_SHOOTER) {
+            //             var target = null;
+            //             if (!target) {
+            //                 var targets = flag.pos.findInRange(FIND_HOSTILE_CREEPS, 6);
+            //                 if (targets.length > 0) {
+            //                     target = targets[0];
+            //                 }
+            //             }
+            //             if (!target) {
+            //                 var targets = flag.pos.findInRange(FIND_HOSTILE_STRUCTURES, 6);
+            //                 if (targets.length > 0) {
+            //                     target = targets[0];
+            //                 }
+            //             }
+            //             if (target) {
+            //                 if (!creep.pos.inRangeTo(target, 3)) {
+            //                     creep.moveTo(target);
+            //                 }
+            //                 creep.rangedAttack(target);
+            //             }
+            //         }
+
+            //         if (creep.memory.role == CONSTS.SOLDIER_ROLE_ARTILLERY) {
+            //             var target = null;
+            //             if (!target) {
+            //                 var targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6);
+            //                 if (targets.length > 0) {
+            //                     target = targets[0];
+            //                 }
+            //             }
+            //             if (!target) {
+            //                 var targets = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 6);
+            //                 if (targets.length > 0) {
+            //                     target = targets[0];
+            //                 }
+            //             }
+            //             if (target) {
+            //                 if (!creep.pos.inRangeTo(target, 3)) {
+            //                     creep.moveTo(target);
+            //                 }
+            //                 creep.rangedMassAttack();
+            //             }
+            //         }
+
+            //         if (creep.memory.role == CONSTS.SOLDIER_ROLE_SAPPER) {
+            //             var target = null;
+            //             if (!target) {
+            //                 var targets = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 3);
+            //                 if (targets.length > 0) {
+            //                     target = targets[0];
+            //                 }
+            //             }
+            //             if (!target) {
+            //                 var targets = creep.pos.findInRange(FIND_STRUCTURES, 3, {
+            //                     filter: (struc) => {
+            //                         return struc.structureType == STRUCTURE_WALL
+            //                             && (!struc.room.controller
+            //                                 || (struc.room.controller && struc.room.controller.my() == false))
+            //                     }
+            //                 });
+            //                 if (targets.length > 0) {
+            //                     target = targets[0];
+            //                 }
+            //             }
+            //             if (target) {
+            //                 creep.moveTo(target);
+            //                 creep.dismantle(target);
+            //             }
+            //         }
+
+            //         if (creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC) {
+            //             var target = null;
+            //             if (!target) {
+            //                 var targets = creep.pos.findInRange(FIND_MY_CREEPS, 1, {
+            //                     filter: (homie) => {
+            //                         return homie.hits < homie.hitsMax
+            //                     }
+            //                 });
+            //                 if (targets.length > 0) {
+            //                     target = targets[0];
+            //                     creep.heal(target)
+            //                 }
+            //             }
+            //             if (!target) {
+            //                 var targets = flag.pos.findInRange(FIND_MY_CREEPS, 6, {
+            //                     filter: (homie) => {
+            //                         return homie.hits < homie.hitsMax
+            //                     }
+            //                 });
+            //                 if (targets.length > 0) {
+            //                     target = targets[0];
+            //                     if (!creep.pos.inRangeTo(target, 3)) {
+            //                         creep.moveTo(target);
+            //                     }
+            //                     creep.rangedHeal(target)
+            //                 }
+            //             }
+            //         };
+
+            //         if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
+            //             var target;
+            //             if (!target) {
+            //                 var target = flag.room.controller;
+            //                 if (target && creep.pos.inRangeTo(target, 3)) {
+            //                     creep.moveTo(target);
+            //                     var ret = creep.claimController(target);
+            //                     if (ret != 0) {
+            //                         var ret = creep.attackController(target);
+            //                     }
+            //                 }
+            //             }
+            //         };
+            //     }
+            //     else {
+            //         creep.memory.working = null;
+            //         creep.memory.working_target = null;
+            //     }
+            //     break;
 
             case 'defend_room':
                 var targets = [];
@@ -486,6 +492,33 @@ var roleSoldier = {
                                 var ret = creep.attackController(target);
                             }
                         }
+                    }
+                };
+                if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
+                    var ret = -99;
+                    var target = creep.room.controller;
+
+                    // claimer_action
+                    if (ret != 0 && creep.claimer_action == 'claim') {
+                        creep.moveTo(target);
+                        ret = creep.claimController(target);
+                        //console.log('claimController:', ret);
+                    }
+                    if (ret != 0 && creep.claimer_action == 'attack') {
+                        creep.moveTo(target);
+                        ret = creep.attackController(target);
+                        //console.log('attackController:', ret);
+                    }
+                    if (ret != 0 && creep.claimer_action == 'reserve') {
+                        creep.moveTo(target);
+                        ret = creep.reserveController(target);
+                        //console.log('reserveController:', ret);
+                    }
+                    if (ret != 0 && creep.claimer_action == 'sign') {
+                        creep.moveTo(target);
+                        ret = creep.signController(target, creep.memory.claimer_sign_text);
+                        creep.say(creep.memory.claimer_sign_text);
+                        creep.claimer_action == null;
                     }
                 };
                 break;
@@ -787,6 +820,8 @@ var roleSoldier = {
                         working_target: null,
                         harvest_source: null,
                         working_room: base.room.name,
+                        claimer_action: 'attack', //'reserve', 'claim' , 'sign'
+                        claimer_sign_text: 'Peace!',
                     }
                 });
 
