@@ -1,5 +1,5 @@
 // RoleSoldier
-// 2021-03-12 16:30
+// 2021-03-12 16:40
 
 
 var CONSTS = require('Sys').CONSTS;
@@ -517,8 +517,10 @@ var roleSoldier = {
                     if (ret != 0 && creep.memory.claimer_action == 'sign') {
                         creep.moveTo(target);
                         ret = creep.signController(target, creep.memory.claimer_sign_text);
-                        creep.say(creep.memory.claimer_sign_text);
-                        creep.claimer_action == null;
+                        if (ret == 0) {
+                            creep.say(creep.memory.claimer_sign_text);
+                            creep.memory.claimer_action == null;
+                        }
                     }
                 };
                 break;
