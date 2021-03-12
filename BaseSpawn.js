@@ -49,7 +49,7 @@ var baseSpawn = {
 
         var workerSetting = Memory.spawns[base.name].workerSetting;
 
-        if (false) { }
+        if (counts_harvester < 1) { roleWorker[CONSTS.WORKER_ROLE_HARVESTER].new(base, 1); }
         else if (counts_harvester < workerSetting[CONSTS.WORKER_ROLE_HARVESTER]) { roleWorker[CONSTS.WORKER_ROLE_HARVESTER].new(base); }
         else if (counts_engineer < workerSetting[CONSTS.WORKER_ROLE_ENGINEER]) { roleWorker[CONSTS.WORKER_ROLE_ENGINEER].new(base); }
         else if (counts_upgrader < workerSetting[CONSTS.WORKER_ROLE_UPGRADER]) { roleWorker[CONSTS.WORKER_ROLE_UPGRADER].new(base); }
@@ -124,4 +124,4 @@ var baseSpawn = {
 }
 
 module.exports = baseSpawn;
- 
+
