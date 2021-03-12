@@ -34,7 +34,7 @@ var baseSpawn = {
     },
 
     spawn_workers: function (base) {
-        var level = base.memory.level
+        var level = base.memory.worker_level;
         var ret = true;
         // ************* Workers ************* //
         // WORKER_ROLE_HARVESTER: 'harvester',
@@ -62,6 +62,7 @@ var baseSpawn = {
     },
 
     spawn_soldiers: function (base) {
+        var level = base.memory.soldier_level;
         var ret = true;
         // ************* Soldiers ************* //
         // SOLDIER_ROLE_TANK: 'tank',
@@ -81,13 +82,13 @@ var baseSpawn = {
         var soldierSetting = Memory.spawns[base.name].soldierSetting;
 
         if (false) { }
-        else if (counts_tank < soldierSetting[CONSTS.SOLDIER_ROLE_TANK]) { roleSoldier[CONSTS.SOLDIER_ROLE_TANK].new(base); }
-        else if (counts_commando < soldierSetting[CONSTS.SOLDIER_ROLE_COMMANDO]) { roleSoldier[CONSTS.SOLDIER_ROLE_COMMANDO].new(base); }
-        else if (counts_shooter < soldierSetting[CONSTS.SOLDIER_ROLE_SHOOTER]) { roleSoldier[CONSTS.SOLDIER_ROLE_SHOOTER].new(base); }
-        else if (counts_artillery < soldierSetting[CONSTS.SOLDIER_ROLE_ARTILLERY]) { roleSoldier[CONSTS.SOLDIER_ROLE_ARTILLERY].new(base); }
-        else if (counts_sapper < soldierSetting[CONSTS.SOLDIER_ROLE_SAPPER]) { roleSoldier[CONSTS.SOLDIER_ROLE_SAPPER].new(base); }
-        else if (counts_medic < soldierSetting[CONSTS.SOLDIER_ROLE_MEDIC]) { roleSoldier[CONSTS.SOLDIER_ROLE_MEDIC].new(base); }
-        else if (counts_claimer < soldierSetting[CONSTS.SOLDIER_ROLE_CLAIMER]) { roleSoldier[CONSTS.SOLDIER_ROLE_CLAIMER].new(base); }
+        else if (counts_tank < soldierSetting[CONSTS.SOLDIER_ROLE_TANK]) { roleSoldier[CONSTS.SOLDIER_ROLE_TANK].new(base,level); }
+        else if (counts_commando < soldierSetting[CONSTS.SOLDIER_ROLE_COMMANDO]) { roleSoldier[CONSTS.SOLDIER_ROLE_COMMANDO].new(base,level); }
+        else if (counts_shooter < soldierSetting[CONSTS.SOLDIER_ROLE_SHOOTER]) { roleSoldier[CONSTS.SOLDIER_ROLE_SHOOTER].new(base,level); }
+        else if (counts_artillery < soldierSetting[CONSTS.SOLDIER_ROLE_ARTILLERY]) { roleSoldier[CONSTS.SOLDIER_ROLE_ARTILLERY].new(base,level); }
+        else if (counts_sapper < soldierSetting[CONSTS.SOLDIER_ROLE_SAPPER]) { roleSoldier[CONSTS.SOLDIER_ROLE_SAPPER].new(base,level); }
+        else if (counts_medic < soldierSetting[CONSTS.SOLDIER_ROLE_MEDIC]) { roleSoldier[CONSTS.SOLDIER_ROLE_MEDIC].new(base,level); }
+        else if (counts_claimer < soldierSetting[CONSTS.SOLDIER_ROLE_CLAIMER]) { roleSoldier[CONSTS.SOLDIER_ROLE_CLAIMER].new(base,level); }
         else { ret = false; }
 
         return ret;
