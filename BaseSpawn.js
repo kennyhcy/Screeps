@@ -1,5 +1,5 @@
 //BaseSpawn.js
-//2021-03-12 14:05
+//2021-03-12 14:30
 var CONSTS = require('Sys').CONSTS;
 
 // creeps:
@@ -34,7 +34,7 @@ var baseSpawn = {
     },
 
     spawn_workers: function (base) {
-        var level = base.room.controller.level;
+        var level = base.memory.level
         var ret = true;
         // ************* Workers ************* //
         // WORKER_ROLE_HARVESTER: 'harvester',
