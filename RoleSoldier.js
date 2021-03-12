@@ -1,5 +1,5 @@
 // RoleSoldier
-// 2021-03-12 16:00
+// 2021-03-12 16:30
 
 
 var CONSTS = require('Sys').CONSTS;
@@ -480,41 +480,41 @@ var roleSoldier = {
                     }
                 };
 
-                if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
-                    var target;
-                    if (!target) {
-                        var target = flag.room.controller;
-                        if (target && creep.pos.inRangeTo(target, 3)) {
-                            creep.moveTo(target);
-                            var ret = creep.claimController(target);
-                            if (ret != 0) {
-                                //console.log('claimController: ', ret);
-                                var ret = creep.attackController(target);
-                            }
-                        }
-                    }
-                };
+                // if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
+                //     var target;
+                //     if (!target) {
+                //         var target = flag.room.controller;
+                //         if (target && creep.pos.inRangeTo(target, 3)) {
+                //             creep.moveTo(target);
+                //             var ret = creep.claimController(target);
+                //             if (ret != 0) {
+                //                 //console.log('claimController: ', ret);
+                //                 var ret = creep.attackController(target);
+                //             }
+                //         }
+                //     }
+                // };
                 if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
                     var ret = -99;
                     var target = creep.room.controller;
 
                     // claimer_action
-                    if (ret != 0 && creep.claimer_action == 'claim') {
+                    if (ret != 0 && creep.memory.claimer_action == 'claim') {
                         creep.moveTo(target);
                         ret = creep.claimController(target);
                         //console.log('claimController:', ret);
                     }
-                    if (ret != 0 && creep.claimer_action == 'attack') {
+                    if (ret != 0 && creep.memory.claimer_action == 'attack') {
                         creep.moveTo(target);
                         ret = creep.attackController(target);
                         //console.log('attackController:', ret);
                     }
-                    if (ret != 0 && creep.claimer_action == 'reserve') {
+                    if (ret != 0 && creep.memory.claimer_action == 'reserve') {
                         creep.moveTo(target);
                         ret = creep.reserveController(target);
                         //console.log('reserveController:', ret);
                     }
-                    if (ret != 0 && creep.claimer_action == 'sign') {
+                    if (ret != 0 && creep.memory.claimer_action == 'sign') {
                         creep.moveTo(target);
                         ret = creep.signController(target, creep.memory.claimer_sign_text);
                         creep.say(creep.memory.claimer_sign_text);
