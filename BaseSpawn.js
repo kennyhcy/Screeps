@@ -1,5 +1,5 @@
 //BaseSpawn.js
-//2021-03-09 16:05
+//2021-03-12 14:05
 var CONSTS = require('Sys').CONSTS;
 
 // creeps:
@@ -34,6 +34,7 @@ var baseSpawn = {
     },
 
     spawn_workers: function (base) {
+        var level = base.room.controller.level;
         var ret = true;
         // ************* Workers ************* //
         // WORKER_ROLE_HARVESTER: 'harvester',
@@ -49,12 +50,12 @@ var baseSpawn = {
 
         var workerSetting = Memory.spawns[base.name].workerSetting;
 
-        if (counts_harvester < 1) { roleWorker[CONSTS.WORKER_ROLE_HARVESTER].new(base, 1); }
-        else if (counts_harvester < workerSetting[CONSTS.WORKER_ROLE_HARVESTER]) { roleWorker[CONSTS.WORKER_ROLE_HARVESTER].new(base); }
-        else if (counts_engineer < workerSetting[CONSTS.WORKER_ROLE_ENGINEER]) { roleWorker[CONSTS.WORKER_ROLE_ENGINEER].new(base); }
-        else if (counts_upgrader < workerSetting[CONSTS.WORKER_ROLE_UPGRADER]) { roleWorker[CONSTS.WORKER_ROLE_UPGRADER].new(base); }
-        else if (counts_transfer < workerSetting[CONSTS.WORKER_ROLE_TRANSFER]) { roleWorker[CONSTS.WORKER_ROLE_TRANSFER].new(base); }
-        else if (counts_storekeeper < workerSetting[CONSTS.WORKER_ROLE_STOREKEEPER]) { roleWorker[CONSTS.WORKER_ROLE_STOREKEEPER].new(base); }
+        if (false) { }
+        else if (counts_harvester < workerSetting[CONSTS.WORKER_ROLE_HARVESTER]) { roleWorker[CONSTS.WORKER_ROLE_HARVESTER].new(base,level); }
+        else if (counts_engineer < workerSetting[CONSTS.WORKER_ROLE_ENGINEER]) { roleWorker[CONSTS.WORKER_ROLE_ENGINEER].new(base,level); }
+        else if (counts_upgrader < workerSetting[CONSTS.WORKER_ROLE_UPGRADER]) { roleWorker[CONSTS.WORKER_ROLE_UPGRADER].new(base,level); }
+        else if (counts_transfer < workerSetting[CONSTS.WORKER_ROLE_TRANSFER]) { roleWorker[CONSTS.WORKER_ROLE_TRANSFER].new(base,level); }
+        else if (counts_storekeeper < workerSetting[CONSTS.WORKER_ROLE_STOREKEEPER]) { roleWorker[CONSTS.WORKER_ROLE_STOREKEEPER].new(base,level); }
         else { ret = false; }
 
         return ret;
