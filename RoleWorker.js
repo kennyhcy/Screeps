@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-12 12:30
+//2021-03-12 14:00
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -193,7 +193,7 @@ var roleWorker = {
 
     [CONSTS.WORKER_ROLE_HARVESTER]: {
         new: function (base, version) {
-            if (!version) {
+            if (!version || version > 2) {
                 version = 2;
             }
             var parts = [];
@@ -292,7 +292,7 @@ var roleWorker = {
 
     [CONSTS.WORKER_ROLE_ENGINEER]: {
         new: function (base, version) {
-            if (!version) {
+            if (!version || version > 2) {
                 version = 2;
             }
             var parts = [];
@@ -555,7 +555,7 @@ var roleWorker = {
 
     [CONSTS.WORKER_ROLE_UPGRADER]: {
         new: function (base, version) {
-            if (!version) {
+            if (!version || version > 2) {
                 version = 2;
             }
             var parts = [];
@@ -685,7 +685,7 @@ var roleWorker = {
 
     [CONSTS.WORKER_ROLE_TRANSFER]: {
         new: function (base, version) {
-            if (!version) {
+            if (!version || version > 2) {
                 version = 2;
             }
             var parts = [];
@@ -791,7 +791,7 @@ var roleWorker = {
 
     [CONSTS.WORKER_ROLE_STOREKEEPER]: {
         new: function (base, version) {
-            if (!version) {
+            if (!version || version > 2) {
                 version = 2;
             }
             var parts = [];
