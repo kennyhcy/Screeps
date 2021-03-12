@@ -1,5 +1,5 @@
 //Sys.js
-//2021-03-09 22:30
+//2021-03-12 14:30 
 
 var sys = {
 
@@ -45,7 +45,8 @@ var sys = {
     run: function () {
         this._initialSettings();
         this._cleansing();
-        this._aiDecision();
+        // this._aiDecision();
+        this._arrange_harvester();
         this._userCommand();
     },
 
@@ -92,6 +93,7 @@ var sys = {
                     [this.CONSTS.SOLDIER_ROLE_CLAIMER]: 0,
                 };
                 Memory.spawns[s]['role'] = this.CONSTS.SPAWN_ROLE_NORMAL;
+                Memory.spawns[s]['level'] = 1;
             }
         };
 
@@ -181,7 +183,8 @@ var sys = {
     },
 
 
-    _aiDecision: function () { //根据配置 调整采矿工
+    // _aiDecision: function () { //根据配置 调整采矿工
+    _arrange_harvester: function () {
         // 每个资源点有几个creep
         var current = {};
         for (var r in Game.rooms) {
