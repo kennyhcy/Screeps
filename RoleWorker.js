@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-11 22:30
+//2021-03-12 12:30
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -405,9 +405,27 @@ var roleWorker = {
 
                     // harvest
                     if (!target) {
-                        target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
+                        target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE, {
+                            filter: (source) => {
+                                return source.room.name != creep.memory.working_room
+                            }
+                        });
                         if (target) {
                             creep.memory.working = 'harvest';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+
+                    // 实在没有资源, 就从spawn里拿
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            filter: (struct) => {
+                                return (struct.structureType == STRUCTURE_SPAWN)
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 100
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
                             creep.memory.working_target = target.id;
                         }
                     }
