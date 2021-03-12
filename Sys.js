@@ -45,7 +45,7 @@ var sys = {
     run: function () {
         this._initialSettings();
         this._cleansing();
-        // this._aiDecision();
+        this._update_memory();
         this._arrange_harvester();
         this._userCommand();
     },
@@ -93,7 +93,8 @@ var sys = {
                     [this.CONSTS.SOLDIER_ROLE_CLAIMER]: 0,
                 };
                 Memory.spawns[s]['role'] = this.CONSTS.SPAWN_ROLE_NORMAL;
-                Memory.spawns[s]['level'] = 1;
+                Memory.spawns[s]['worker_level'] = 1;
+                Memory.spawns[s]['soldier_level'] = 1;
             }
         };
 
@@ -155,6 +156,26 @@ var sys = {
     },
 
 
+    _update_memory: function () {
+        // var colorGroup = {
+        //     COLOR_PURPLE: CONSTS.SOLDIER_ROLE_TANK, // 2,
+        //     COLOR_BLUE: CONSTS.SOLDIER_ROLE_COMMANDO,// 3,
+        //     COLOR_CYAN: CONSTS.SOLDIER_ROLE_SHOOTER, //4,
+        //     COLOR_GREEN: CONSTS.SOLDIER_ROLE_ARTILLERY, //5,
+        //     COLOR_YELLOW: CONSTS.SOLDIER_ROLE_SAPPER, //6,
+        //     COLOR_ORANGE: CONSTS.SOLDIER_ROLE_CLAIMER, //7,
+        //     COLOR_BROWN: CONSTS.SOLDIER_ROLE_MEDIC, //8,
+        //     COLOR_RED : 'all',
+        // };
+
+        // for (var f in Game.flags) {
+        //     var flag = Game.flags[f];
+        //     var name = "Group-" + flag.color + '-' + colorGroup[flag.secondaryColor] + '-' + Game.time;
+        //     // flag.setname(name);
+        // }
+    },
+
+
     _userCommand: function () {
         //console.log(Game.time);
         var comm;
@@ -182,8 +203,7 @@ var sys = {
         }
     },
 
-
-    // _aiDecision: function () { //根据配置 调整采矿工
+    
     _arrange_harvester: function () {
         // 每个资源点有几个creep
         var current = {};
