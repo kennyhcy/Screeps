@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-12 14:00
+//2021-03-14 11:49
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -33,7 +33,7 @@ var roleWorker = {
                     creep.moveTo(target);
                 }
                 else {
-                    console.log('ERROR : ', creep.name, ' harvest fail: ', ret);
+                    //console.log('ERROR : ', creep.name, ' harvest fail: ', ret);
                 }
             } else {
                 creep.memory.working = null;
@@ -53,7 +53,7 @@ var roleWorker = {
                     creep.moveTo(target);
                 }
                 else {
-                    console.log('ERROR : ', creep.name, ' store fail: ', ret);
+                    //console.log('ERROR : ', creep.name, ' store fail: ', ret);
                 }
             }
             else {
@@ -78,7 +78,7 @@ var roleWorker = {
                     creep.moveTo(target);
                 }
                 else {
-                    console.log('ERROR : ', creep.name, ' pickup fail: ', ret);
+                    //console.log('ERROR : ', creep.name, ' pickup fail: ', ret);
                 }
             }
             else {
@@ -100,7 +100,7 @@ var roleWorker = {
                     creep.moveTo(target);
                 }
                 else {
-                    console.log('ERROR : ', creep.name, ' withdraw fail: ', ret);
+                    //console.log('ERROR : ', creep.name, ' withdraw fail: ', ret);
                 }
             }
             else {
@@ -119,7 +119,7 @@ var roleWorker = {
                 } else if (ret == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
                 } else {
-                    console.log('ERROR : ', creep.name, ' build fail: ', ret);
+                    //console.log('ERROR : ', creep.name, ' build fail: ', ret);
                 }
             } else {
                 creep.memory.working = null;
@@ -138,7 +138,7 @@ var roleWorker = {
                 } else if (ret == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
                 } else {
-                    console.log('ERROR : ', creep.name, ' refill fail: ', ret);
+                    //console.log('ERROR : ', creep.name, ' refill fail: ', ret);
                 }
             }
             else {
@@ -158,7 +158,7 @@ var roleWorker = {
                 } else if (ret == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
                 } else {
-                    console.log('ERROR : ', creep.name, ' repair fail: ', ret);
+                    //console.log('ERROR : ', creep.name, ' repair fail: ', ret);
                 }
             } else {
                 creep.memory.working = null;
@@ -176,7 +176,7 @@ var roleWorker = {
                 } else if (ret == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
                 } else {
-                    console.log('ERROR : ', creep.name, ' upgradeController fail: ', ret);
+                    //console.log('ERROR : ', creep.name, ' upgradeController fail: ', ret);
                 }
             } else {
                 creep.memory.working = null;
@@ -231,7 +231,7 @@ var roleWorker = {
 
             //console.log('Spawning new harvester: ' + newCreep);
             if (retCreep == 0) {
-                console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_HARVESTER, ' : ', newName);
+                //console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_HARVESTER, ' : ', newName);
             }
         },
 
@@ -268,6 +268,22 @@ var roleWorker = {
                                     || struc.structureType == STRUCTURE_SPAWN
                                     || struc.structureType == STRUCTURE_STORAGE
                                     || struc.structureType == STRUCTURE_CONTAINER)
+                                    && struc.room.name == creep.memory.working_room
+                                    && struc.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+
+                        if (target) {
+                            creep.memory.working = 'store';
+                            creep.memory.working_target = target.id;
+                            //console.log('Checkpoint-90', creep.name, ' : ', target.id);
+                        }
+                    }
+
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                            filter: (struc) => {
+                                return (struc.structureType == STRUCTURE_CONTAINER)
                                     && struc.room.name == creep.memory.working_room
                                     && struc.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
@@ -330,7 +346,7 @@ var roleWorker = {
 
             //console.log('Spawning new harvester: ' + newCreep);
             if (retCreep == 0) {
-                console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_ENGINEER, ' : ', newName);
+                //console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_ENGINEER, ' : ', newName);
             }
 
         },
@@ -348,10 +364,23 @@ var roleWorker = {
                 if (creep.store.getUsedCapacity() <= 0) { // 如果手上没有能量, 则去找能量
                     // container and storage
                     if (!target) {
-                        target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                             filter: (struct) => {
                                 return (struct.structureType == STRUCTURE_CONTAINER
-                                    || struct.structureType == STRUCTURE_STORAGE)
+                                )
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    };
+
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            filter: (struct) => {
+                                return (struct.structureType == STRUCTURE_STORAGE)
                                     && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
@@ -481,32 +510,33 @@ var roleWorker = {
                     //     }
                     // }
 
-                    // //修路 1->1 Tower的任务
-                    // if (!target) {
-                    //     targets = working_room.find(FIND_STRUCTURES, {
-                    //         filter: (struct) => {
-                    //             return (struct.structureType == STRUCTURE_ROAD
-                    //                 && struct.hits < struct.hitsMax)
-                    //         }
-                    //     });
-                    //     if (targets.length > 0) {
-                    //         for (var t in targets) {
-                    //             var tar = targets[t];
+                    //修路 1->1 的任务
+                    if (!target) {
+                        targets = working_room.find(FIND_STRUCTURES, {
+                            filter: (struct) => {
+                                return (struct.structureType == STRUCTURE_ROAD
+                                    || struct.structureType == STRUCTURE_CONTAINER)
+                                    && struct.hits < struct.hitsMax
+                            }
+                        });
+                        if (targets.length > 0) {
+                            for (var t in targets) {
+                                var tar = targets[t];
 
-                    //             var counts = _.filter(Game.creeps, (creep) =>
-                    //                 creep.memory.role == CONSTS.WORKER_ROLE_ENGINEER
-                    //                 && creep.memory.working == 'repair'
-                    //                 && creep.memory.working_target == tar.id).length;
+                                var counts = _.filter(Game.creeps, (creep) =>
+                                    creep.memory.role == CONSTS.WORKER_ROLE_ENGINEER
+                                    && creep.memory.working == 'repair'
+                                    && creep.memory.working_target == tar.id).length;
 
-                    //             if (counts <= 0) {
-                    //                 target = tar;
-                    //                 creep.memory.working = 'repair';
-                    //                 creep.memory.working_target = target.id;
-                    //                 break;
-                    //             }
-                    //         }
-                    //     }
-                    // }
+                                if (counts <= 0) {
+                                    target = tar;
+                                    creep.memory.working = 'repair';
+                                    creep.memory.working_target = target.id;
+                                    break;
+                                }
+                            }
+                        }
+                    }
 
                     // //修墙 1->1 Tower的任务
                     // if (!target) {
@@ -593,7 +623,7 @@ var roleWorker = {
 
             //console.log('Spawning new harvester: ' + newCreep);
             if (retCreep == 0) {
-                console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_UPGRADER, ' : ', newName);
+                //console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_UPGRADER, ' : ', newName);
             }
         },
 
@@ -640,8 +670,19 @@ var roleWorker = {
                     if (!target) {
                         target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
                             filter: (struct) => {
-                                return (struct.structureType == STRUCTURE_CONTAINER
-                                    || struct.structureType == STRUCTURE_STORAGE)
+                                return (struct.structureType == STRUCTURE_STORAGE)
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                            filter: (struct) => {
+                                return struct.structureType == STRUCTURE_CONTAINER
                                     && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
@@ -723,7 +764,7 @@ var roleWorker = {
 
             //console.log('Spawning new harvester: ' + newCreep);
             if (retCreep == 0) {
-                console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_TRANSFER, ' : ', newName);
+                //console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_TRANSFER, ' : ', newName);
             }
         },
 
@@ -745,6 +786,7 @@ var roleWorker = {
                                     || tower.structureType == STRUCTURE_SPAWN
                                     || tower.structureType == STRUCTURE_EXTENSION)
                                     && tower.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                                    && tower.store.getFreeCapacity(RESOURCE_ENERGY) > tower.store.getUsedCapacity(RESOURCE_ENERGY)
                             }
                         });
                         if (targets.length > 0) {
@@ -752,8 +794,25 @@ var roleWorker = {
                             creep.memory.working = 'refill';
                             creep.memory.working_target = target.id;
                         }
-                    }
-                    if (!target) { // 放入消耗点的LINK中
+                    };
+
+                    if (!target) {
+                        targets = creep.room.find(FIND_MY_STRUCTURES, {
+                            filter: (tower) => {
+                                return (tower.structureType == STRUCTURE_TOWER
+                                    || tower.structureType == STRUCTURE_SPAWN
+                                    || tower.structureType == STRUCTURE_EXTENSION)
+                                    && tower.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                        if (targets.length > 0) {
+                            target = targets[0];
+                            creep.memory.working = 'refill';
+                            creep.memory.working_target = target.id;
+                        }
+                    };
+
+                    if (!target) { // 放入Center的LINK中
                         targets = creep_base.room.find(FIND_MY_STRUCTURES, {
                             filter: (consumer) => {
                                 return consumer.structureType == STRUCTURE_LINK
@@ -766,7 +825,8 @@ var roleWorker = {
                             creep.memory.working = 'refill';
                             creep.memory.working_target = target.id;
                         }
-                    }
+                    };
+
                 }
                 else { // 无能量， 则从 Storage > container 中取
 
@@ -829,7 +889,7 @@ var roleWorker = {
 
             //console.log('Spawning new harvester: ' + newCreep);
             if (retCreep == 0) {
-                console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_STOREKEEPER, ' : ', newName);
+                //console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_STOREKEEPER, ' : ', newName);
             }
         },
 

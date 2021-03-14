@@ -1,5 +1,5 @@
 // RoleSoldier
-// 2021-03-12 16:40
+// 2021-03-14 16:00
 
 
 var CONSTS = require('Sys').CONSTS;
@@ -547,6 +547,13 @@ var roleSoldier = {
                 case 3:
                     parts = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE,];
                     break;
+                case 4: // cose = 1200
+                    parts = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                    break;
+
                 default:
                     version = 1;
                     parts = [TOUGH, MOVE];

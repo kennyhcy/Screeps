@@ -176,34 +176,7 @@ var sys = {
     },
 
 
-    _userCommand: function () {
-        //console.log(Game.time);
-        var comm;
-        if (!Memory.ucomm) {
-            Memory.ucomm = '';
-        } else {
-            comm = Memory.ucomm;
-            Memory.ucomm = '';
-        }
 
-        if (comm == 'clear flag') {
-            for (var i in Game.flags) {
-                mflag = Game.flags[i];
-                mflag.remove();
-            }
-            console.log(comm, ' ---> OK');
-        } else if (comm == 'reset group') {
-            for (var i in Game.creeps) {
-                mcreep = Game.creeps[i];
-                if (mcreep.memory.creeptype == 'soldier') {
-                    mcreep.memory.group1 = COLOR_RED;
-                }
-            }
-            console.log(comm, ' ---> OK');
-        }
-    },
-
-    
     _arrange_harvester: function () {
         // 每个资源点有几个creep
         var current = {};
@@ -281,6 +254,41 @@ var sys = {
 
         // 剩下的creep目标点为空的，就空着吧， creep无任务时加提示
 
+    },
+
+
+
+    _userCommand: function () {
+        //console.log(Game.time);
+        var comm;
+        if (!Memory.ucomm) {
+            Memory.ucomm = '';
+        } else {
+            comm = Memory.ucomm;
+            Memory.ucomm = '';
+        }
+
+        if (comm == 'clear flag') {
+            for (var i in Game.flags) {
+                mflag = Game.flags[i];
+                mflag.remove();
+            }
+            console.log(comm, ' ---> OK');
+        } else if (comm == 'reset group') {
+            for (var i in Game.creeps) {
+                mcreep = Game.creeps[i];
+                if (mcreep.memory.creeptype == 'soldier') {
+                    mcreep.memory.group1 = COLOR_RED;
+                }
+            }
+            console.log(comm, ' ---> OK');
+        } else if (comm == 'energy') {
+            for (var r in Game.rooms) {
+                console.log(Game.rooms[r].name, ' : ', Game.rooms[r].energyAvailable,
+                    ' / ', Game.rooms[r].energyCapacityAvailable);
+
+            }
+        }
     },
 
 
