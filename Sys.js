@@ -1,5 +1,5 @@
 //Sys.js
-//2021-03-12 14:30 
+//2021-03-15
 
 var sys = {
 
@@ -45,9 +45,10 @@ var sys = {
     run: function () {
         this._initialSettings();
         this._cleansing();
-        this._update_memory();
         this._arrange_harvester();
         this._userCommand();
+
+        this._work_queue();
     },
 
 
@@ -156,24 +157,7 @@ var sys = {
     },
 
 
-    _update_memory: function () {
-        // var colorGroup = {
-        //     COLOR_PURPLE: CONSTS.SOLDIER_ROLE_TANK, // 2,
-        //     COLOR_BLUE: CONSTS.SOLDIER_ROLE_COMMANDO,// 3,
-        //     COLOR_CYAN: CONSTS.SOLDIER_ROLE_SHOOTER, //4,
-        //     COLOR_GREEN: CONSTS.SOLDIER_ROLE_ARTILLERY, //5,
-        //     COLOR_YELLOW: CONSTS.SOLDIER_ROLE_SAPPER, //6,
-        //     COLOR_ORANGE: CONSTS.SOLDIER_ROLE_CLAIMER, //7,
-        //     COLOR_BROWN: CONSTS.SOLDIER_ROLE_MEDIC, //8,
-        //     COLOR_RED : 'all',
-        // };
 
-        // for (var f in Game.flags) {
-        //     var flag = Game.flags[f];
-        //     var name = "Group-" + flag.color + '-' + colorGroup[flag.secondaryColor] + '-' + Game.time;
-        //     // flag.setname(name);
-        // }
-    },
 
 
 
@@ -288,6 +272,23 @@ var sys = {
                     ' / ', Game.rooms[r].energyCapacityAvailable);
 
             }
+        }
+    },
+
+    _work_queue: function () {
+        for (var r in Game.rooms) {
+            var room = Game.rooms[r];
+
+            if (!room.memory.tower_queue) {
+                room.memory.tower_queue = [];
+            }
+
+            if (!room.memory.work_queue) {
+                room.memory.work_queue = [];
+            }
+
+            
+
         }
     },
 

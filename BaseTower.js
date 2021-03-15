@@ -1,111 +1,89 @@
 // BaseTower.js
-// 2021-03-14 14:48
+// 2021-03-15
 
 var CONSTS = require('Sys').CONSTS;
 
 var baseTower = {
     run: function (tower) {
-        var memory = Memory.towers[tower.id];
-        this[memory.role].run(tower);
-    },
+        var tower_role = Memory.towers[tower.id].role;
 
-    [CONSTS.TOWER_ROLE_NORMAL]:
-    {
-        run: function (tower) {
-            //var tower = Game.structures[tower.id];
-            var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-            if (target) {
-                tower.attack(target);
+        if (tower_role == CONSTS.TOWER_ROLE_NORMAL) {
+            var ret = this._attack(tower);
+            if (!ret) {
+                var ret = this._repair(tower);
             }
+        }
 
-            if (!target) {
-                var target = tower.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                    filter: (structure) => {
-                        return structure.hits < structure.hitsMax
-                            && structure.hits < 10000000
-                    }
-                });
-            };
-            if (!target) {
-                target = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return (
-                            structure.structureType == STRUCTURE_ROAD
-                            || structure.structureType == STRUCTURE_CONTAINER
-                            || structure.structureType == STRUCTURE_STORAGE
-                        ) && structure.hits < structure.hitsMax
-                            && structure.hits < 1000000
-                    }
-                });
-            };
-            if (!target) {
-                target = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return (structure.structureType == STRUCTURE_WALL
-                        ) && structure.hits < structure.hitsMax
-                            && structure.hits < 10000
-                    }
-                });
-            }
+        if (tower_role == CONSTS.SPAWN_ROLE_MILITARY_ONLY) {
+            var ret = this._attack(tower);
+        }
 
-            if (target) {
-                tower.repair(target);
-            }
-
+        if (tower_role == CONSTS.SPAWN_ROLE_CIVILIAN_ONLY) {
+            var ret = this._repair(tower);
         }
     },
 
-    [CONSTS.SPAWN_ROLE_MILITARY_ONLY]:
-    {
-        run: function (tower) {
-            var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-            if (target) {
-                tower.attack(target);
-            }
-        },
+    _attack: function (tower) {
+        var target;
+        if (!target) {
+            target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        }
+        if (target) {
+            tower.attack(target);
+            return true;
+        } else { return false }
+    },
+
+    _repair: function (tower) {
+        var target;
+        if (!target) {
+            var targets = tower.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                filter: (structure) => {
+                    return structure.hits < structure.hitsMax
+                    //&& structure.hits < 1000000
+                }
+            });
+            targets.sort((a, b) => a.hits - b.hits);
+            target = target[0];
+        };
+
+        // if (!target) {
+        //     var target = tower.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+        //         filter: (structure) => {
+        //             return structure.hits < structure.hitsMax
+        //                 && structure.hits < 1000000
+        //         }
+        //     });
+        // };
+
+        if (!target) {
+            target = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+                filter: (structure) => {
+                    return (
+                        structure.structureType == STRUCTURE_ROAD
+                        || structure.structureType == STRUCTURE_CONTAINER
+                        || structure.structureType == STRUCTURE_STORAGE
+                    ) && structure.hits < structure.hitsMax
+                        && structure.hits < 1000000
+                }
+            });
+        };
+        if (!target) {
+            target = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+                filter: (structure) => {
+                    return (structure.structureType == STRUCTURE_WALL
+                    ) && structure.hits < structure.hitsMax
+                        && structure.hits < 10000
+                }
+            });
+        };
+        if (target) {
+            tower.repair(target);
+            return true;
+        } else { return false }
 
     },
 
-
-    [CONSTS.SPAWN_ROLE_CIVILIAN_ONLY]:
-    {
-        run: function (tower) {
-            var target;
-            if (!target) {
-                var target = tower.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                    filter: (structure) => {
-                        return structure.hits < structure.hitsMax
-                            && structure.hits < 10000000
-                    }
-                });
-            };
-            if (!target) {
-                target = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return (
-                            structure.structureType == STRUCTURE_ROAD
-                            || structure.structureType == STRUCTURE_CONTAINER
-                            || structure.structureType == STRUCTURE_STORAGE
-                        ) && structure.hits < structure.hitsMax
-                            && structure.hits < 1000000
-                    }
-                });
-            };
-            if (!target) {
-                target = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return (structure.structureType == STRUCTURE_WALL
-                        ) && structure.hits < structure.hitsMax
-                            && structure.hits < 10000
-                    }
-                });
-            }
-            if (target) {
-                tower.repair(target);
-            }
-        },
-
-    },
 }
 
 module.exports = baseTower;
