@@ -45,7 +45,7 @@ var baseTower = {
             });
             if (targets.length > 0) {
                 targets.sort((a, b) => a.hits - b.hits);
-                target = target[0];
+                target = targets[0];
             }
         };
 
