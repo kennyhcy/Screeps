@@ -37,14 +37,16 @@ var baseTower = {
     _repair: function (tower) {
         var target;
         if (!target) {
-            var targets = tower.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+            var targets = tower.room.find(FIND_MY_STRUCTURES, {
                 filter: (structure) => {
                     return structure.hits < structure.hitsMax
                     //&& structure.hits < 1000000
                 }
             });
-            targets.sort((a, b) => a.hits - b.hits);
-            target = target[0];
+            if (targets.length > 0) {
+                targets.sort((a, b) => a.hits - b.hits);
+                target = target[0];
+            }
         };
 
         // if (!target) {
