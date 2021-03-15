@@ -1,5 +1,5 @@
 //Role Worker
-//2021-03-14 11:49
+//2021-03-15
 
 //CONSTS
 var CONSTS = require('Sys').CONSTS;
@@ -60,7 +60,6 @@ var roleWorker = {
                 creep.memory.working = null;
                 creep.memory.working_target = null;
             }
-
         }
         else if (creep.memory.working == 'pickup') {
             var target = Game.getObjectById(creep.memory.working_target);
@@ -188,7 +187,6 @@ var roleWorker = {
             creep.memory.working = null;
             creep.memory.working_target = null;
         }
-
     },
 
     [CONSTS.WORKER_ROLE_HARVESTER]: {
@@ -831,13 +829,20 @@ var roleWorker = {
                 else { // 无能量， 则从 Storage > container 中取
 
                     if (!target) {
-                        targets = creep_base.room.find(FIND_MY_STRUCTURES, {
-                            filter: (storage) => {
-                                return storage.structureType == STRUCTURE_STORAGE
-                                    || storage.structureType == STRUCTURE_CONTAINER
-                            }
+                        target = creep_base.room.storage;
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+
+                    if (!target) {
+                        targets = creep_base.room.find(FIND_STRUCTURES, {
+                            filter: (struct) => struct.structureType == STRUCTURE_CONTAINER
+                                && struct.store[RESOURCE_ENERGY] > 0
                         });
                         if (targets.length > 0) {
+                            targets.sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY]);
                             target = targets[0];
                             creep.memory.working = 'withdraw';
                             creep.memory.working_target = target.id;

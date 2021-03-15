@@ -12,7 +12,7 @@ var baseTower = {
     [CONSTS.TOWER_ROLE_NORMAL]:
     {
         run: function (tower) {
-            //var tower = Game.structures[ttower.id];
+            //var tower = Game.structures[tower.id];
             var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
             if (target) {
                 tower.attack(target);

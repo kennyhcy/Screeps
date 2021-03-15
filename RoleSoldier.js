@@ -12,6 +12,8 @@ var roleSoldier = {
             this.execute_work(creep);
         }
     },
+
+
     arrange_work(creep) {
         var target = null;
         var secGroup = {
@@ -72,6 +74,8 @@ var roleSoldier = {
             }
         }
     },
+
+    
     execute_work(creep) {
         switch (creep.memory.working) {
             case 'move_pos':
