@@ -10,7 +10,15 @@ var roleSoldier = require('RoleSoldier');
 var roleWorker = require('RoleWorker');
 
 module.exports.loop = function () {
-    sys.run();
+    // sys.run();
+    sys.initialSettings();
+    sys.cleansing();
+
+    sys.arrange_harvester();
+    sys.arrange_worker();
+    sys.arrange_soldier();
+
+    sys.userCommand();
 
     for (var i in Game.spawns) {
         var base = Game.spawns[i];

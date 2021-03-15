@@ -1,7 +1,11 @@
 //BaseLink
 //2021-03-15
 
-var CONSTS = require('Sys').CONSTS;
+// var CONSTS = require('Sys').CONSTS;
+// link roles:
+// LINK_ROLE_NORMAL: 'normal', // consumer site
+// LINK_ROLE_HARVEST_SITE: 'harvest_site',
+// LINK_ROLE_CENTER: 'center',
 
 var baseLink = {
     run: function (link) {
@@ -13,14 +17,14 @@ var baseLink = {
             //console.log(memory);
         }
 
-        if (memory && memory.role == CONSTS.LINK_ROLE_HARVEST_SITE
+        if (memory && memory.role == 'harvest_site'
             && link.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
             // console.log('check');
             var targets = link.room.find(FIND_MY_STRUCTURES, {
                 filter: (center) => {
                     return center.structureType == STRUCTURE_LINK
                         && Memory.links[center.id]
-                        && Memory.links[center.id].role == CONSTS.LINK_ROLE_CENTER
+                        && Memory.links[center.id].role == 'center'
                         && center.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                 }
             });
@@ -30,14 +34,14 @@ var baseLink = {
         };
 
 
-        if (memory && memory.role == CONSTS.LINK_ROLE_CENTER
+        if (memory && memory.role == 'center'
             && link.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
             // console.log('check');
             var targets = link.room.find(FIND_MY_STRUCTURES, {
                 filter: (center) => {
                     return center.structureType == STRUCTURE_LINK
                         && Memory.links[center.id]
-                        && Memory.links[center.id].role == CONSTS.LINK_ROLE_NORMAL
+                        && Memory.links[center.id].role == 'normal'
                         && center.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                 }
             });

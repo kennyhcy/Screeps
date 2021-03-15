@@ -1,197 +1,35 @@
 //Role Worker
 //2021-03-15
 
+
 //CONSTS
-var CONSTS = require('Sys').CONSTS;
+var work = require('ActionWork');
+
+const CREEP_TYPE = {
+    WORKER: 'worker',
+    SOLDIER: 'soldier',
+}
+
+const WORKER_ROLE = {
+    HARVESTER: 'harvester',     // 采矿
+    ENGINEER: 'engineer',       // 建造 / 修墙 / 升级
+    UPGRADER: 'upgrader',       // 升级
+    TRANSFER: 'transfer',       // 补充 Tower / Extension
+    STOREKEEPER: 'storekeeper', // 存入 Container Storage
+    REPAIRER: 'repairer',
+    // 'defender', // defender room
+}
 
 var roleWorker = {
     run: function (creep) {
         this[creep.memory.role].arrange_work(creep);
         if (creep.memory.working) {
-            this[creep.memory.working](creep);
-        }
-        else {
-            console.log('ERROR: ', creep.name, " : no logic found for action ", creep.memory.working, " !!!");
-            creep.memory.working = null;
-            creep.memory.working_target = null;
+            work[creep.memory.working](creep);
         }
     },
 
-    harvest: function (creep) {
-        var target = Game.getObjectById(creep.memory.working_target);
-        if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-            && target) {
-
-            var ret = creep.harvest(target);
-            if (ret == OK || ret == ERR_BUSY) {
-                // console.log('Check point1');
-            }
-            else if (ret == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-            }
-            else {
-                //console.log('ERROR : ', creep.name, ' harvest fail: ', ret);
-            }
-        } else {
-            creep.memory.working = null;
-            creep.memory.working_target = null;
-        }
-    },
-
-    store: function (creep) {
-        target = Game.getObjectById(creep.memory.working_target);
-        if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-            && target && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
-
-            var ret = creep.transfer(target, RESOURCE_ENERGY);
-            if (ret == OK || ret == ERR_BUSY) {
-                // console.log('Check point1');
-            }
-            else if (ret == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-            }
-            else {
-                //console.log('ERROR : ', creep.name, ' store fail: ', ret);
-            }
-        }
-        else {
-            creep.memory.working = null;
-            creep.memory.working_target = null;
-        }
-    },
-
-    pickup: function (creep) {
-        var target = Game.getObjectById(creep.memory.working_target);
-        //console.log('check point 348', target);
-        if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-            && target
-            && target.resourceType == RESOURCE_ENERGY
-            && target.amount > 0) {
-
-            var ret = creep.pickup(target, RESOURCE_ENERGY);
-            if (ret == OK || ret == ERR_BUSY) {
-                // console.log('Check point1');
-            }
-            else if (ret == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-            }
-            else {
-                //console.log('ERROR : ', creep.name, ' pickup fail: ', ret);
-            }
-        }
-        else {
-            creep.memory.working = null;
-            creep.memory.working_target = null;
-        }
-    },
-
-    withdraw: function (creep) {
-        var target = Game.getObjectById(creep.memory.working_target);
-        if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-            && target
-            && target.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
-
-            var ret = creep.withdraw(target, RESOURCE_ENERGY);
-            if (ret == OK || ret == ERR_BUSY) {
-                // console.log('Check point1');
-            }
-            else if (ret == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-            }
-            else {
-                //console.log('ERROR : ', creep.name, ' withdraw fail: ', ret);
-            }
-        }
-        else {
-            creep.memory.working = null;
-            creep.memory.working_target = null;
-        }
-    },
-
-    build: function (creep) {
-        var target = Game.getObjectById(creep.memory.working_target);
-        if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-            && target) {
-
-            var ret = creep.build(target);
-            if (ret == OK || ret == ERR_BUSY) {
-                // console.log('Check point1');
-            } else if (ret == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-            } else {
-                //console.log('ERROR : ', creep.name, ' build fail: ', ret);
-            }
-        } else {
-            creep.memory.working = null;
-            creep.memory.working_target = null;
-        }
-    },
-
-    refill: function (creep) {
-        var target = Game.getObjectById(creep.memory.working_target);
-        if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-            && target
-            && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
-
-            var ret = creep.transfer(target, RESOURCE_ENERGY);
-            if (ret == OK || ret == ERR_BUSY) {
-                // console.log('Check point1');
-            } else if (ret == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-            } else {
-                //console.log('ERROR : ', creep.name, ' refill fail: ', ret);
-            }
-        }
-        else {
-            creep.memory.working = null;
-            creep.memory.working_target = null;
-        }
-    },
-
-    repair: function (creep) {
-        var target = Game.getObjectById(creep.memory.working_target);
-        if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-            && target
-            && target.hits < target.hitsMax) {
-
-            var ret = creep.repair(target);
-            if (ret == OK || ret == ERR_BUSY) {
-                // console.log('Check point1');
-            } else if (ret == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-            } else {
-                //console.log('ERROR : ', creep.name, ' repair fail: ', ret);
-            }
-        } else {
-            creep.memory.working = null;
-            creep.memory.working_target = null;
-        }
-    },
-
-    upgrade: function (creep) {
-        var target = Game.getObjectById(creep.memory.working_target);
-        if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-            && target) {
-
-            var ret = creep.upgradeController(target);
-            if (ret == OK || ret == ERR_BUSY) {
-                // console.log('Check point1');
-            } else if (ret == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-            } else {
-                //console.log('ERROR : ', creep.name, ' upgradeController fail: ', ret);
-            }
-        } else {
-            creep.memory.working = null;
-            creep.memory.working_target = null;
-        }
-    },
-
-    [CONSTS.WORKER_ROLE_HARVESTER]: {
+    [WORKER_ROLE.HARVESTER]: {
         new: function (base, version) {
-            if (!version || version > 2) {
-                version = 2;
-            }
             var parts = [];
             switch (version) {
                 case 1:
@@ -207,75 +45,48 @@ var roleWorker = {
                     version = 1;
                     parts = [WORK, CARRY, MOVE];
             }
-
-            //var newName = 'WH-' + version + '-' + Game.time.toString().substr(3, 8);
             var newName = 'WH-' + version + '-' + Game.time;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_WORKER,
-                        role: CONSTS.WORKER_ROLE_HARVESTER,
+                        creepType: CREEP_TYPE.WORKER,
+                        role: WORKER_ROLE.HARVESTER,
                         base: base.name,
                         group: 0,
                         working: '',
                         working_target: null,
                         harvest_source: null,
+                        base_room: base.room.name,
                         working_room: base.room.name,
                     }
                 });
-
-            //console.log('Spawning new harvester: ' + newCreep);
-            if (retCreep == 0) {
-                //console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_HARVESTER, ' : ', newName);
-            }
         },
 
         arrange_work: function (creep) { // harvester
-            //creep : Creep;
-            //var creep = Game.creeps[icreep.name];
             var creep_base = Game.spawns[creep.memory.base];
-            //var ret = creep.drop(RESOURCE_ENERGY);
-            //console.log(target);
-
             if (!creep.memory.working) { // 如果没有工作， 则分配工作
-
                 var target = null;
-
                 if (creep.store.getUsedCapacity() <= 0) { // 如果手上没能量， 则去采矿
-
-                    if (creep.memory.harvest_source) { //如果 AI 分配了矿源， 则去采矿
-                        target = Game.getObjectById(creep.memory.harvest_source);
+                    if (creep.memory.harvest_source) {
                         creep.memory.working = 'harvest';
-                        creep.memory.working_target = target.id;
-                    } else {
-                        // 继续等待AI分配矿源                        
+                        creep.memory.working_target = creep.memory.harvest_source;
                     }
-
                 }
                 else { // 如果手上有能量， 则去存储
-                    //creep.memory.working = 'store';
                     var target = null;
-                    if (!target) {
+                    if (!target) { // 采矿 ===> Link / Container/ Storage / Extension / Spawn
                         target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
                             filter: (struc) => {
                                 return (struc.structureType == STRUCTURE_LINK
                                     || struc.structureType == STRUCTURE_EXTENSION
                                     || struc.structureType == STRUCTURE_SPAWN
-                                    || struc.structureType == STRUCTURE_STORAGE
-                                    || struc.structureType == STRUCTURE_CONTAINER)
+                                    || struc.structureType == STRUCTURE_STORAGE)
                                     && struc.room.name == creep.memory.working_room
                                     && struc.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
-
-                        if (target) {
-                            creep.memory.working = 'store';
-                            creep.memory.working_target = target.id;
-                            //console.log('Checkpoint-90', creep.name, ' : ', target.id);
-                        }
                     }
-
                     if (!target) {
                         target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                             filter: (struc) => {
@@ -284,29 +95,22 @@ var roleWorker = {
                                     && struc.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                             }
                         });
-
-                        if (target) {
-                            creep.memory.working = 'store';
-                            creep.memory.working_target = target.id;
-                            //console.log('Checkpoint-90', creep.name, ' : ', target.id);
-                        }
                     }
-                }
-
-                if (!target) {
-                    //console.log("Warning: ", creep.memory.role, " ", creep.name, " is free! returning base!");
-                    creep.moveTo(creep_base);
+                    if (target) {
+                        creep.memory.working = 'store';
+                        creep.memory.working_target = target.id;
+                    } else {
+                        //console.log("Warning: ", creep.memory.role, " ", creep.name, " is free! returning base!");
+                        creep.moveTo(creep_base);
+                    }
                 }
             }// end of if
         },// end of arrange work
     }, // end of role harverster
 
 
-    [CONSTS.WORKER_ROLE_ENGINEER]: {
+    [WORKER_ROLE.ENGINEER]: {
         new: function (base, version) {
-            if (!version || version > 2) {
-                version = 2;
-            }
             var parts = [];
             switch (version) {
                 case 1:
@@ -329,63 +133,26 @@ var roleWorker = {
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_WORKER,
-                        role: CONSTS.WORKER_ROLE_ENGINEER,
+                        creepType: CREEP_TYPE.WORKER,
+                        role: WORKER_ROLE.ENGINEER,
                         base: base.name,
                         group: 0,
                         working: null,
                         working_target: null,
                         harvest_source: null,
+                        base_room: base.room.name,
                         working_room: base.room.name,
                     }
                 });
-
-            //console.log('Spawning new harvester: ' + newCreep);
-            if (retCreep == 0) {
-                //console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_ENGINEER, ' : ', newName);
-            }
-
         },
 
         arrange_work: function (creep) { //engineer
-            //var creep = Game.creeps[icreep.name];
-
-            // var creep_base = Game.spawns[creep.memory.base];
             var working_room = Game.rooms[creep.memory.working_room];
-
             if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
                 var targets = null;
                 var target = null;
 
                 if (creep.store.getUsedCapacity() <= 0) { // 如果手上没有能量, 则去找能量
-                    // container and storage
-                    if (!target) {
-                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                            filter: (struct) => {
-                                return (struct.structureType == STRUCTURE_CONTAINER
-                                )
-                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-                            }
-                        });
-                        if (target) {
-                            creep.memory.working = 'withdraw';
-                            creep.memory.working_target = target.id;
-                        }
-                    };
-
-                    if (!target) {
-                        target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                            filter: (struct) => {
-                                return (struct.structureType == STRUCTURE_STORAGE)
-                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-                            }
-                        });
-                        if (target) {
-                            creep.memory.working = 'withdraw';
-                            creep.memory.working_target = target.id;
-                        }
-                    }
-
                     // Dropped resources
                     if (!target) {
                         target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
@@ -428,6 +195,33 @@ var roleWorker = {
                         }
                     }
 
+                    // container and storage
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                            filter: (struct) => {
+                                return struct.structureType == STRUCTURE_CONTAINER
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    };
+
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            filter: (struct) => {
+                                return (struct.structureType == STRUCTURE_STORAGE)
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+
                     // harvest
                     if (!target) {
                         target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE, {
@@ -458,16 +252,6 @@ var roleWorker = {
                 } else { // 如果手上有能量
 
                     // 建造
-                    // if (!target) {
-                    //     targets = creep_base.room.find(FIND_MY_CONSTRUCTION_SITES);
-                    //     if (targets.length > 0) {
-                    //         target = targets[0];
-                    //         creep.memory.working = 'build';
-                    //         creep.memory.working_target = target.id;
-                    //     }
-                    // }
-                    // working_room
-                    // 建造
                     if (!target) {
                         targets = working_room.find(FIND_MY_CONSTRUCTION_SITES);
                         if (targets.length > 0) {
@@ -477,36 +261,7 @@ var roleWorker = {
                         }
                     }
 
-                    // // 补充能量 WT的任务
-                    // if (!target) {
-                    //     targets = working_room.find(FIND_MY_STRUCTURES, {
-                    //         filter: (struct) => {
-                    //             return struct.structureType == STRUCTURE_TOWER
-                    //                 && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                    //         }
-                    //     });
-                    //     if (targets.length > 0) {
-                    //         target = targets[0];
-                    //         creep.memory.working = 'refill';
-                    //         creep.memory.working_target = target.id;
-                    //     }
-                    // }
-
-                    // // 优先修自己的建筑 n->1 Tower的任务
-                    // if (!target) {
-                    //     targets = working_room.find(FIND_MY_STRUCTURES, {
-                    //         filter: (struct) => {
-                    //             return (struct.hits < struct.hitsMax)
-                    //         }
-                    //     });
-                    //     if (targets.length > 0) {
-                    //         target = targets[0];
-                    //         creep.memory.working = 'repair';
-                    //         creep.memory.working_target = target.id;
-                    //     }
-                    // }
-
-                    //修路 1->1 的任务
+                    //修路
                     if (!target) {
                         targets = working_room.find(FIND_STRUCTURES, {
                             filter: (struct) => {
@@ -516,50 +271,11 @@ var roleWorker = {
                             }
                         });
                         if (targets.length > 0) {
-                            for (var t in targets) {
-                                var tar = targets[t];
-
-                                var counts = _.filter(Game.creeps, (creep) =>
-                                    creep.memory.role == CONSTS.WORKER_ROLE_ENGINEER
-                                    && creep.memory.working == 'repair'
-                                    && creep.memory.working_target == tar.id).length;
-
-                                if (counts <= 0) {
-                                    target = tar;
-                                    creep.memory.working = 'repair';
-                                    creep.memory.working_target = target.id;
-                                    break;
-                                }
-                            }
+                            target = targets[0];
+                            creep.memory.working = 'repair';
+                            creep.memory.working_target = target.id;
                         }
                     }
-
-                    // //修墙 1->1 Tower的任务
-                    // if (!target) {
-                    //     targets = working_room.find(FIND_STRUCTURES, {
-                    //         filter: (struct) => {
-                    //             return (struct.structureType == STRUCTURE_WALL
-                    //                 && struct.hits < struct.hitsMax)
-                    //         }
-                    //     });
-                    //     if (targets.length > 0) {
-                    //         for (var t in targets) {
-                    //             var tar = targets[t];
-
-                    //             var counts = _.filter(Game.creeps, (creep) =>
-                    //                 creep.memory.role == CONSTS.WORKER_ROLE_ENGINEER
-                    //                 && creep.memory.working == 'repair'
-                    //                 && creep.memory.working_target == tar.id).length;
-
-                    //             if (counts <= 0) {
-                    //                 target = tar;
-                    //                 creep.memory.working = 'repair';
-                    //                 creep.memory.working_target = target.id;
-                    //                 break;
-                    //             }
-                    //         }
-                    //     }
-                    // }
 
                     // 升级
                     if (!target) {
@@ -579,11 +295,8 @@ var roleWorker = {
         }, // end of work arrange
     }, // end of role engineer
 
-    [CONSTS.WORKER_ROLE_UPGRADER]: {
+    [WORKER_ROLE.UPGRADER]: {
         new: function (base, version) {
-            if (!version || version > 2) {
-                version = 2;
-            }
             var parts = [];
             switch (version) {
                 case 1:
@@ -606,13 +319,14 @@ var roleWorker = {
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_WORKER,
-                        role: CONSTS.WORKER_ROLE_UPGRADER,
+                        creepType: CREEP_TYPE.WORKER,
+                        role: WORKER_ROLE.UPGRADER,
                         base: base.name,
                         group: 0,
                         working: null,
                         working_target: null,
                         harvest_source: null,
+                        base_room: base.room.name,
                         working_room: base.room.name,
                     }
                 });
@@ -632,36 +346,7 @@ var roleWorker = {
             if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
                 //var targets = null;
                 var target = null;
-
                 if (creep.store.getUsedCapacity() <= 0) { // 如果手上没有能量, 则去找能量
-                    // Dropped resources
-                    if (!target) {
-                        target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-                            filter: (resource) => {
-                                return resource.room == creep.room
-                                    && resource.resourceType == RESOURCE_ENERGY
-                            }
-                        });
-
-                        if (target) {
-                            creep.memory.working = 'pickup';
-                            creep.memory.working_target = target.id;
-                        }
-                    }
-
-                    // tombstones
-                    if (!target) {
-                        target = creep.pos.findClosestByRange(FIND_TOMBSTONES, {
-                            filter: (struct) => {
-                                return struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-                            }
-                        });
-                        if (target) {
-                            creep.memory.working = 'withdraw';
-                            creep.memory.working_target = target.id;
-                        }
-                    }
-
                     // container and storage
                     if (!target) {
                         target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
@@ -687,7 +372,6 @@ var roleWorker = {
                             creep.memory.working_target = target.id;
                         }
                     }
-
                     // harvest
                     if (!target) {
                         target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
@@ -720,7 +404,7 @@ var roleWorker = {
     },// end of role upgrader
 
 
-    [CONSTS.WORKER_ROLE_TRANSFER]: {
+    [WORKER_ROLE.TRANSFER]: {
         new: function (base, version) {
             if (!version || version > 2) {
                 version = 2;
@@ -747,13 +431,14 @@ var roleWorker = {
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_WORKER,
-                        role: CONSTS.WORKER_ROLE_TRANSFER,
+                        creepType: CREEP_TYPE.WORKER,
+                        role: WORKER_ROLE.TRANSFER,
                         base: base.name,
                         group: 0,
                         working: null,
                         working_target: null,
                         harvest_source: null,
+                        base_room: base.room.name,
                         working_room: base.room.name,
                     }
                 });
@@ -807,22 +492,6 @@ var roleWorker = {
                             creep.memory.working_target = target.id;
                         }
                     };
-
-                    if (!target) { // 放入Center的LINK中
-                        targets = creep_base.room.find(FIND_MY_STRUCTURES, {
-                            filter: (consumer) => {
-                                return consumer.structureType == STRUCTURE_LINK
-                                    && Memory.links[consumer.id].role == CONSTS.LINK_ROLE_NORMAL
-                                    && consumer.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                            }
-                        });
-                        if (targets.length > 0) {
-                            target = targets[0];
-                            creep.memory.working = 'refill';
-                            creep.memory.working_target = target.id;
-                        }
-                    };
-
                 }
                 else { // 无能量， 则从 Storage > container 中取
 
@@ -846,13 +515,19 @@ var roleWorker = {
                             creep.memory.working_target = target.id;
                         }
                     }
+
+                    // no work to do
+                    if (!target) {
+                        //console.log("Warning: ", creep.memory.role, " ", creep.name, " is free!!!");
+                        creep.moveTo(creep_base);
+                    }
                 }
             }// end of if
         },//end of arrange work
     }, //end of role transfer
 
 
-    [CONSTS.WORKER_ROLE_STOREKEEPER]: {
+    [WORKER_ROLE.STOREKEEPER]: {
         new: function (base, version) {
             if (!version || version > 2) {
                 version = 2;
@@ -879,21 +554,17 @@ var roleWorker = {
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_WORKER,
-                        role: CONSTS.WORKER_ROLE_STOREKEEPER,
+                        creepType: CREEP_TYPE.WORKER,
+                        role: WORKER_ROLE.STOREKEEPER,
                         base: base.name,
                         group: 0,
                         working: null,
                         working_target: null,
                         harvest_source: null,
+                        base_room: base.room.name,
                         working_room: base.room.name,
                     }
                 });
-
-            //console.log('Spawning new harvester: ' + newCreep);
-            if (retCreep == 0) {
-                //console.log('SUCCESS: Spawning new ', CONSTS.WORKER_ROLE_STOREKEEPER, ' : ', newName);
-            }
         },
 
         arrange_work: function (creep) { // storekeeper
@@ -942,7 +613,7 @@ var roleWorker = {
                     targets = creep_base.room.find(FIND_MY_STRUCTURES, {
                         filter: (center) => {
                             return center.structureType == STRUCTURE_LINK
-                                && Memory.links[center.id].role == CONSTS.LINK_ROLE_CENTER
+                                && Memory.links[center.id].role == 'center'
                         }
                     });
 
@@ -952,11 +623,189 @@ var roleWorker = {
                         creep.memory.working = 'withdraw';
                         creep.memory.working_target = target.id;
                     }
+
+                    // no work to do
+                    if (!target) {
+                        //console.log("Warning: ", creep.memory.role, " ", creep.name, " is free!!!");
+                        creep.moveTo(creep_base);
+                    }
                 }
 
             } // end of if
         },//end of arrange work
     }, // end of role storekeeper
+
+    [WORKER_ROLE.REPAIRER]: {
+        new: function (base, version) {
+            var parts = [];
+            switch (version) {
+                case 1:
+                    parts = [WORK, CARRY, MOVE];
+                    break;
+                case 2:
+                    parts = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+                    break;
+                case 3:
+                    parts = [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE,];
+                    break;
+                default:
+                    version = 1;
+                    parts = [WORK, CARRY, MOVE];
+            }
+
+            //var newName = 'WE-' + version + '-' + Game.time.toString().substr(3, 8);
+            var newName = 'WR-' + version + '-' + Game.time;
+            var retCreep = base.spawnCreep(parts, newName,
+                {
+                    memory:
+                    {
+                        creepType: CREEP_TYPE.WORKER,
+                        role: WORKER_ROLE.REPAIRER,
+                        base: base.name,
+                        group: 0,
+                        working: null,
+                        working_target: null,
+                        harvest_source: null,
+                        base_room: base.room.name,
+                        working_room: base.room.name,
+                    }
+                });
+        },
+
+        arrange_work: function (creep) { //repairer
+            var working_room = Game.rooms[creep.memory.working_room];
+            if (!creep.memory.working) { //如果没有工作，或者工作已经完成， 则分配工作
+                var targets = null;
+                var target = null;
+
+                if (creep.store.getUsedCapacity() <= 0) { // 如果手上没有能量, 则去找能量
+                    // Dropped resources
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                            filter: (resource) => {
+                                return resource.room == creep.room
+                                    && resource.resourceType == RESOURCE_ENERGY
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'pickup';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+
+                    // tombstones
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_TOMBSTONES, {
+                            filter: (struct) => {
+                                return struct.room == creep.room
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+
+                    // ruin
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_RUINS, {
+                            filter: (struct) => {
+                                return struct.room == creep.room
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+
+                    // container and storage
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                            filter: (struct) => {
+                                return struct.structureType == STRUCTURE_CONTAINER
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    };
+
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            filter: (struct) => {
+                                return (struct.structureType == STRUCTURE_STORAGE)
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+
+                    // harvest
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE, {
+                            filter: (source) => {
+                                return source.room.name != creep.memory.working_room
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'harvest';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+
+                    // 实在没有资源, 就从spawn里拿
+                    if (!target) {
+                        target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                            filter: (struct) => {
+                                return (struct.structureType == STRUCTURE_SPAWN)
+                                    && struct.store.getUsedCapacity(RESOURCE_ENERGY) > 100
+                            }
+                        });
+                        if (target) {
+                            creep.memory.working = 'withdraw';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+
+                } else { // 如果手上有能量
+                    //修路
+                    if (!target) {
+                        targets = working_room.find(FIND_STRUCTURES, {
+                            filter: (struct) => {
+                                return (struct.structureType == STRUCTURE_ROAD
+                                    || struct.structureType == STRUCTURE_WALL
+                                    || struct.structureType == STRUCTURE_CONTAINER)
+                                    && struct.hits < struct.hitsMax
+                            }
+                        });
+                        if (targets.length > 0) {
+                            // targets.sort((a, b) => a.hits - b.hits);
+                            target = targets[0];
+                            creep.memory.working = 'repair';
+                            creep.memory.working_target = target.id;
+                        }
+                    }
+                }
+                // no work to do
+                if (!target) {
+                    //console.log("Warning: ", creep.memory.role, " ", creep.name, " is free!!!");
+                    creep.moveTo(Game.spawns[creep.memory.base]);
+                }
+            }// end of if
+        }, // end of work arrange
+    }, // end of role engineer
+
+
+
+
 
 } // end of roleWorker
 

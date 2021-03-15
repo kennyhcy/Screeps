@@ -43,16 +43,11 @@ var sys = {
 
 
     run: function () {
-        this._initialSettings();
-        this._cleansing();
-        this._arrange_harvester();
-        this._userCommand();
 
-        this._work_queue();
     },
 
 
-    _initialSettings: function () {
+    initialSettings: function () {
         /*** room settings ***/
         if (!Memory.rooms) {
             Memory.rooms = {}
@@ -127,7 +122,7 @@ var sys = {
     },
 
 
-    _cleansing: function () {
+    cleansing: function () {
         /*** Cleansing ***/
         for (var name in Memory.creeps) { //cleasing
             if (!Game.creeps[name]) {
@@ -161,7 +156,7 @@ var sys = {
 
 
 
-    _arrange_harvester: function () {
+    arrange_harvester: function () {
         // 每个资源点有几个creep
         var current = {};
         for (var r in Game.rooms) {
@@ -242,7 +237,7 @@ var sys = {
 
 
 
-    _userCommand: function () {
+    userCommand: function () {
         //console.log(Game.time);
         var comm;
         if (!Memory.ucomm) {
@@ -275,21 +270,34 @@ var sys = {
         }
     },
 
-    _work_queue: function () {
-        for (var r in Game.rooms) {
-            var room = Game.rooms[r];
+    arrange_worker: function () {
+        // for (var r in Game.rooms) {
+        //     var room = Game.rooms[r];
 
-            if (!room.memory.tower_queue) {
-                room.memory.tower_queue = [];
-            }
+        //     if (!room.memory.enemy_queue) {
+        //         // room.memory.enemy_queue = [];
+        //     } else {
+        //         // delete room.memory.enemy_queue;
+        //     }
 
-            if (!room.memory.work_queue) {
-                room.memory.work_queue = [];
-            }
+        //     var targets = room.find(FIND_HOSTILE_POWER_CREEPS);
+        //     if (targets.length > 0) {
+        //         for (var t in targets) {
+        //             const element = array[index];
 
-            
+        //         }
+        //     }
 
-        }
+
+        //     var targets = room.find(FIND_HOSTILE_CREEPS);
+
+        // }
+    },
+
+
+
+    arrange_soldier: function () {
+
     },
 
 

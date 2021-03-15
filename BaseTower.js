@@ -2,6 +2,10 @@
 // 2021-03-15
 
 var CONSTS = require('Sys').CONSTS;
+        // // Tower roles:
+        // TOWER_ROLE_NORMAL: 'normal',
+        // TOWER_ROLE_MILITARY_ONLY: 'military_only',
+        // TOWER_ROLE_CIVILIAN_ONLY: 'civilian_only',
 
 var baseTower = {
     run: function (tower) {
