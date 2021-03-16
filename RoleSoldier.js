@@ -121,7 +121,6 @@ var roleSoldier = {
                 creep.memory.working = 'attack_room';
                 creep.memory.working_target = null;
             }
-
         },
 
     },
@@ -548,7 +547,7 @@ var roleSoldier = {
                     parts = [CLAIM, CLAIM, MOVE, MOVE];
                     break;
                 case 3:
-                    parts = [CLAIM, CLAIM, CLAIM, MOVE, MOVE, MOVE,];
+                    parts = [CLAIM, CLAIM, CLAIM, MOVE, MOVE, MOVE];
                     break;
                 default:
                     version = 1;
@@ -569,14 +568,14 @@ var roleSoldier = {
                         harvest_source: null,
                         base_room: base.room.name,
                         working_room: base.room.name,
-                        claimer_action: 'attack', //'reserve', 'claim' , 'sign'
-                        claimer_sign_text: 'Peace!',
+                        claimer_action: 'sign', //'reserve', 'claim' , 'sign'
+                        claimer_sign_text: 'Peace & Love!',
                     }
                 });
 
             //console.log('Spawning new harvester: ' + newCreep);
             if (retCreep == 0) {
-                console.log('SUCCESS: Spawning new ', Game.creeps[newName].memory.role, ' : ', newName);
+                console.log(base.name, ' SUCCESS: Spawning new ', SOLDIER_ROLE.CLAIMER, ' : ', newName);
             }
         }, //new
 
