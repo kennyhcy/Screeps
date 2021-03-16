@@ -10,7 +10,7 @@ var fight = {
         }
     },
 
-    attack_flag: function (creep) {
+    attack_area: function (creep) {
         var flag = Game.flags[creep.memory.working_target];
         if (flag) {
             var ret = creep.moveTo(flag);
@@ -34,7 +34,8 @@ var fight = {
     },
 
     attack_room: function (creep) {
-        var working_room = Game.rooms[creep.memory.working_room];
+        //var working_room = Game.rooms[creep.memory.working_room];
+        var working_room = creep.room;
         if (working_room) {
             var target = null;
             if (!target) {
@@ -82,7 +83,8 @@ var fight = {
     },
 
     rangedattack_room: function (creep) {
-        var working_room = Game.rooms[creep.memory.working_room];
+        // var working_room = Game.rooms[creep.memory.working_room];
+        var working_room = creep.room;
         if (working_room) {
             var target = null;
             if (!target) {
@@ -130,7 +132,8 @@ var fight = {
     },
 
     massattack_room: function (creep) {
-        var working_room = Game.rooms[creep.memory.working_room];
+        // var working_room = Game.rooms[creep.memory.working_room];
+        var working_room = creep.room;
         if (working_room) {
             var target = null;
             if (!target) {
@@ -185,7 +188,8 @@ var fight = {
     },
 
     dismantle_room: function (creep) {
-        var working_room = Game.rooms[creep.memory.working_room];
+        // var working_room = Game.rooms[creep.memory.working_room];
+        var working_room = creep.room;
         if (working_room) {
             var target = null;
             if (!target) {
@@ -246,7 +250,28 @@ var fight = {
     },
 
     heal_room: function (creep) {
+        var working_room = creep.room;
+        var target = null;
+        if (!target) {
+            var targets = working_room.find(FIND_MY_CREEPS, {
+                filter: (homie) => {
+                    return homie.hits < homie.hitsMax
+                }
+            });
+            if (targets.length > 0) {
+                target = targets[0];
+            }
+        }
+        if (target) {
+            var ret = creep.heal(target);
+            if (ret != 0) {
+                var ret = creep.rangedHeal(target);
+            }
 
+            if (ret != 0) {
+                creep.moveTo(target);
+            }
+        }
     },
 
     claim_area: function (creep) {
@@ -283,7 +308,31 @@ var fight = {
     },
 
     claim_room: function (creep) {
+        var working_room = creep.room;
+        var target = working_room.controller;
+        var ret = -99;
 
+        if (target) {
+            creep.moveTo(target);
+            // claimer_action
+            if (ret != 0 && creep.claimer_action == 'claim') {
+                ret = creep.claimController(target);
+                //console.log('claimController:', ret);
+            }
+            if (ret != 0 && creep.claimer_action == 'attack') {
+                ret = creep.attackController(target);
+                //console.log('attackController:', ret);
+            }
+            if (ret != 0 && creep.claimer_action == 'reserve') {
+                ret = creep.reserveController(target);
+                //console.log('reserveController:', ret);
+            }
+            if (ret != 0 && creep.claimer_action == 'sign') {
+                ret = creep.signController(target, creep.memory.claimer_sign_text);
+                creep.say(creep.memory.claimer_sign_text);
+                creep.claimer_action == null;
+            }
+        }
     },
 
 }

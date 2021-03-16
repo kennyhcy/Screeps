@@ -1,373 +1,42 @@
 // RoleSoldier
-// 2021-03-14 16:00
+// 2021-03-16
 
+var fight = require('ActionFight');
 
-var CONSTS = require('Sys').CONSTS;
+const CREEP_TYPE = {
+    WORKER: 'worker',
+    SOLDIER: 'soldier',
+}
+
+const SOLDIER_ROLE = {
+    TANK: 'tank',
+    COMMANDO: 'commando',
+    SHOOTER: 'shooter',
+    ARTILLERY: 'artillery',
+    SAPPER: 'sapper',
+    CLAIMER: 'claimer',
+    MEDIC: 'medic',
+}
+
+const SECGROUP = {
+    [SOLDIER_ROLE.TANK]: COLOR_PURPLE,     //2,
+    [SOLDIER_ROLE.COMMANDO]: COLOR_BLUE,   //3,
+    [SOLDIER_ROLE.SHOOTER]: COLOR_CYAN,    //4,
+    [SOLDIER_ROLE.ARTILLERY]: COLOR_GREEN, //5,
+    [SOLDIER_ROLE.SAPPER]: COLOR_YELLOW,   //6,
+    [SOLDIER_ROLE.CLAIMER]: COLOR_ORANGE,  //7,
+    [SOLDIER_ROLE.MEDIC]: COLOR_BROWN,     //8,
+};
+
 var roleSoldier = {
     run: function (creep) {
-        this.arrange_work(creep);
-        this.execute_work(creep);
-        if (!creep.memory.working) {
-            this.arrange_work(creep);
-            this.execute_work(creep);
+        this[creep.memory.role].arrange_work(creep);
+        if (creep.memory.working) {
+            fight[creep.memory.working](creep);
         }
     },
 
-
-    arrange_work(creep) {
-        var target = null;
-        var secGroup = {
-            [CONSTS.SOLDIER_ROLE_TANK]: COLOR_PURPLE, // 2,
-            [CONSTS.SOLDIER_ROLE_COMMANDO]: COLOR_BLUE,// 3,
-            [CONSTS.SOLDIER_ROLE_SHOOTER]: COLOR_CYAN, //4,
-            [CONSTS.SOLDIER_ROLE_ARTILLERY]: COLOR_GREEN, //5,
-            [CONSTS.SOLDIER_ROLE_SAPPER]: COLOR_YELLOW, //6,
-            [CONSTS.SOLDIER_ROLE_CLAIMER]: COLOR_ORANGE, //7,
-            [CONSTS.SOLDIER_ROLE_MEDIC]: COLOR_BROWN, //8,
-        };
-
-        if (!target) {
-            if (!target) {
-                var flags = _.filter(Game.flags,
-                    (flag) => {
-                        return flag.color == creep.memory.group
-                            && flag.secondaryColor == secGroup[creep.memory.role]
-                    }
-                );
-                if (flags.length > 0) {
-                    target = flags[0];
-                }
-            }
-
-            if (!target) {
-                var flags = _.filter(Game.flags,
-                    (flag) => {
-                        return flag.color == creep.memory.group
-                            && flag.secondaryColor == COLOR_RED
-                    }
-                );
-                if (flags.length > 0) {
-                    target = flags[0];
-                }
-            }
-            if (target && target.secondaryColor != COLOR_WHITE) {
-                creep.memory.working = 'attack_area';
-                creep.memory.working_target = target.name;
-            }
-            else if (target && target.secondaryColor == COLOR_WHITE) {
-                creep.memory.working = 'move_pos';
-                creep.memory.working_target = target.name;
-            }
-            else if (!target) {
-                creep.memory.working = 'defend_room';
-                creep.memory.working_target = creep.room.name;
-            }
-        }
-    },
-
-    
-    execute_work(creep) {
-        switch (creep.memory.working) {
-            case 'move_pos':
-                // var flag = Game.getObjectById(creep.memory.working_target);
-                var flag = Game.flags[creep.memory.working_target];
-                if (flag) {
-                    var ret = creep.moveTo(flag);
-                    if (ret != 0) {
-                        creep.memory.working = null;
-                        creep.memory.working_target = null;
-                    }
-                }
-                break;
-
-            case 'attack_area':
-                var targets = [];
-                //var flag = Game.getObjectById(creep.memory.working_target);
-                var flag = Game.flags[creep.memory.working_target];
-                if (flag) {
-                    var ret = creep.moveTo(flag);
-                    if (ret != 0) {
-                        creep.memory.working = null;
-                        creep.memory.working_target = null;
-                    }
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_COMMANDO) {
-                        var target = null;
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 1);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 1);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-
-                        if (target) {
-                            creep.attack(target);
-                        }
-                    }
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_SHOOTER) {
-                        var target = null;
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 3);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (target) {
-                            creep.rangedAttack(target);
-                        }
-                    }
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_ARTILLERY) {
-                        var target = null;
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 3);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (target) {
-                            creep.rangedMassAttack();
-                        }
-                    }
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_SAPPER) {
-                        var target = null;
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 1);
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_STRUCTURES, 1, {
-                                filter: (struc) => {
-                                    return struc.structureType == STRUCTURE_WALL
-                                        && (!struc.room.controller
-                                            || (struc.room.controller && struc.room.controller.my == false))
-                                }
-                            });
-                            if (targets.length > 0) {
-                                target = targets[0];
-                            }
-                        }
-                        if (target) {
-                            creep.dismantle(target);
-                        }
-                    };
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC) {
-                        var target = null;
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_MY_CREEPS, 1, {
-                                filter: (homie) => {
-                                    return homie.hits < homie.hitsMax
-                                }
-                            });
-                            if (targets.length > 0) {
-                                target = targets[0];
-                                creep.heal(target)
-                            }
-                        }
-                        if (!target) {
-                            var targets = creep.pos.findInRange(FIND_MY_CREEPS, 3, {
-                                filter: (homie) => {
-                                    return homie.hits < homie.hitsMax
-                                }
-                            });
-                            if (targets.length > 0) {
-                                target = targets[0];
-                                creep.rangedHeal(target)
-                            }
-                        }
-                    };
-
-                    if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
-                        var target;
-                        var ret = -99;
-                        if (flag.room) {
-                            var target = flag.room.controller;
-                        }
-                        if (target && creep.pos.inRangeTo(target, 3)) {
-                            creep.moveTo(target);
-                            // claimer_action
-                            if (ret != 0 && creep.claimer_action == 'claim') {
-                                ret = creep.claimController(target);
-                                //console.log('claimController:', ret);
-                            }
-                            if (ret != 0 && creep.claimer_action == 'attack') {
-                                ret = creep.attackController(target);
-                                //console.log('attackController:', ret);
-                            }
-                            if (ret != 0 && creep.claimer_action == 'reserve') {
-                                ret = creep.reserveController(target);
-                                //console.log('reserveController:', ret);
-                            }
-                            if (ret != 0 && creep.claimer_action == 'sign') {
-                                ret = creep.signController(target, creep.memory.claimer_sign_text);
-                                creep.say(creep.memory.claimer_sign_text);
-                                creep.claimer_action == null;
-                            }
-                        }
-                    };
-
-                }
-                break;
-
-            case 'defend_room':
-                var targets = [];
-                //var flag = Game.getObjectById(creep.memory.working_target);
-                //var flag = creep.pos.room.controller;
-                var flag;
-                if (!flag) {
-                    flag = creep;
-                }
-                if (creep.memory.role == CONSTS.SOLDIER_ROLE_COMMANDO) {
-                    var target = null;
-                    if (!target) {
-                        var target = flag.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-                    }
-                    if (!target) {
-                        var target = flag.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
-                    }
-                    if (target) {
-                        creep.moveTo(target);
-                        creep.attack(target);
-                    }
-                }
-
-                if (creep.memory.role == CONSTS.SOLDIER_ROLE_SHOOTER) {
-                    var target = null;
-                    if (!target) {
-                        var target = flag.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-                    }
-                    if (!target) {
-                        var target = flag.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
-                    }
-                    if (target) {
-                        if (!creep.pos.inRangeTo(target, 3)) {
-                            creep.moveTo(target);
-                        }
-                        creep.rangedAttack(target);
-                    }
-                }
-
-                if (creep.memory.role == CONSTS.SOLDIER_ROLE_ARTILLERY) {
-                    var target = null;
-                    if (!target) {
-                        var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-                    }
-                    if (!target) {
-                        var target = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
-                    }
-                    if (target) {
-                        if (!creep.pos.inRangeTo(target, 3)) {
-                            creep.moveTo(target);
-                        }
-                        creep.rangedMassAttack();
-                    }
-                };
-
-                if (creep.memory.role == CONSTS.SOLDIER_ROLE_SAPPER) {
-                    var target = null;
-                    if (!target) {
-                        var target = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
-                    }
-                    if (!target) {
-                        var target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                            filter: (struc) => {
-                                return struc.structureType == STRUCTURE_WALL
-                                    && (!struc.room.controller
-                                        || (struc.room.controller && struc.room.controller.my == false))
-                            }
-                        });
-                    }
-                    if (target) {
-                        creep.moveTo(target);
-                        creep.dismantle(target);
-                    }
-                };
-
-                if (creep.memory.role == CONSTS.SOLDIER_ROLE_MEDIC) {
-                    var target = null;
-                    if (!target) {
-                        var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
-                            filter: (homie) => {
-                                return homie.hits < homie.hitsMax
-                            }
-                        });
-                    }
-                    if (target) {
-                        if (creep, pos.inRangeTo(target, 1)) {
-                            creep.heal(target);
-                        }
-                        else {
-                            if (!creep.pos.inRangeTo(target, 3)) {
-                                creep.moveTo(target);
-                            }
-                            creep.rangedHeal(target);
-                        }
-                    }
-                };
-
-                if (creep.memory.role == CONSTS.SOLDIER_ROLE_CLAIMER) {
-                    var ret = -99;
-                    var target = creep.room.controller;
-
-                    // claimer_action
-                    if (ret != 0 && creep.memory.claimer_action == 'claim') {
-                        creep.moveTo(target);
-                        ret = creep.claimController(target);
-                        //console.log('claimController:', ret);
-                    }
-                    if (ret != 0 && creep.memory.claimer_action == 'attack') {
-                        creep.moveTo(target);
-                        ret = creep.attackController(target);
-                        //console.log('attackController:', ret);
-                    }
-                    if (ret != 0 && creep.memory.claimer_action == 'reserve') {
-                        creep.moveTo(target);
-                        ret = creep.reserveController(target);
-                        //console.log('reserveController:', ret);
-                    }
-                    if (ret != 0 && creep.memory.claimer_action == 'sign') {
-                        creep.moveTo(target);
-                        ret = creep.signController(target, creep.memory.claimer_sign_text);
-                        if (ret == 0) {
-                            creep.say(creep.memory.claimer_sign_text);
-                            creep.memory.claimer_action == null;
-                        }
-                    }
-                };
-                break;
-
-            default:
-                creep.memory.working = null;
-                creep.memory.working_target = null;
-                console.log(creep.name, ' No work!');
-                break;
-        }
-    },
-
-    [CONSTS.SOLDIER_ROLE_TANK]:
+    [SOLDIER_ROLE.TANK]:
     {
         new: function (base, version) {
             var parts = [];
@@ -398,8 +67,8 @@ var roleSoldier = {
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_SOLDIER,
-                        role: CONSTS.SOLDIER_ROLE_TANK,
+                        creepType: CREEP_TYPE.SOLDIER,
+                        role: SOLDIER_ROLE.TANK,
                         base: base.name,
                         group: 1,
                         working: '',
@@ -416,9 +85,48 @@ var roleSoldier = {
             }
         },
 
+        arrange_work: function (creep) {
+            var flag = null;
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == SECGROUP[creep.memory.role]
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == COLOR_RED
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (flag && flag.secondaryColor == COLOR_WHITE) {
+                creep.memory.working = 'move_pos';
+                creep.memory.working_target = flag.name;
+            }
+            else if (flag) {
+                creep.memory.working = 'attack_area';
+                creep.memory.working_target = flag.name;
+            }
+            else {
+                creep.memory.working = 'attack_room';
+                creep.memory.working_target = null;
+            }
+
+        },
+
     },
 
-    [CONSTS.SOLDIER_ROLE_COMMANDO]:
+    [SOLDIER_ROLE.COMMANDO]:
     {
         new: function (base, version) {
             var parts = [];
@@ -442,8 +150,8 @@ var roleSoldier = {
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_SOLDIER,
-                        role: CONSTS.SOLDIER_ROLE_COMMANDO,
+                        creepType: CREEP_TYPE.SOLDIER,
+                        role: SOLDIER_ROLE.COMMANDO,
                         base: base.name,
                         group: 1,
                         working: '',
@@ -460,9 +168,47 @@ var roleSoldier = {
             }
         },
 
+        arrange_work: function (creep) {
+            var flag = null;
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == SECGROUP[creep.memory.role]
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == COLOR_RED
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (flag && flag.secondaryColor == COLOR_WHITE) {
+                creep.memory.working = 'move_pos';
+                creep.memory.working_target = flag.name;
+            }
+            else if (flag) {
+                creep.memory.working = 'attack_area';
+                creep.memory.working_target = flag.name;
+            }
+            else {
+                creep.memory.working = 'attack_room';
+                creep.memory.working_target = null;
+            }
+        },
+
     },
 
-    [CONSTS.SOLDIER_ROLE_SHOOTER]:
+    [SOLDIER_ROLE.SHOOTER]:
     {
         new: function (base, version) {
             var parts = [];
@@ -486,8 +232,8 @@ var roleSoldier = {
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_SOLDIER,
-                        role: CONSTS.SOLDIER_ROLE_SHOOTER,
+                        creepType: CREEP_TYPE.SOLDIER,
+                        role: SOLDIER_ROLE.SHOOTER,
                         base: base.name,
                         group: 1,
                         working: '',
@@ -504,9 +250,47 @@ var roleSoldier = {
             }
         },
 
+        arrange_work: function (creep) {
+            var flag = null;
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == SECGROUP[creep.memory.role]
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == COLOR_RED
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (flag && flag.secondaryColor == COLOR_WHITE) {
+                creep.memory.working = 'move_pos';
+                creep.memory.working_target = flag.name;
+            }
+            else if (flag) {
+                creep.memory.working = 'rangedattack_area';
+                creep.memory.working_target = flag.name;
+            }
+            else {
+                creep.memory.working = 'rangedattack_room';
+                creep.memory.working_target = null;
+            }
+        },
+
     },
 
-    [CONSTS.SOLDIER_ROLE_ARTILLERY]:
+    [SOLDIER_ROLE.ARTILLERY]:
     {
         new: function (base, version) {
             var parts = [];
@@ -530,8 +314,8 @@ var roleSoldier = {
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_SOLDIER,
-                        role: CONSTS.SOLDIER_ROLE_ARTILLERY,
+                        creepType: CREEP_TYPE.SOLDIER,
+                        role: SOLDIER_ROLE.ARTILLERY,
                         base: base.name,
                         group: 1,
                         working: '',
@@ -548,9 +332,48 @@ var roleSoldier = {
             }
         },
 
+
+        arrange_work: function (creep) {
+            var flag = null;
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == SECGROUP[creep.memory.role]
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == COLOR_RED
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (flag && flag.secondaryColor == COLOR_WHITE) {
+                creep.memory.working = 'move_pos';
+                creep.memory.working_target = flag.name;
+            }
+            else if (flag) {
+                creep.memory.working = 'massattack_area';
+                creep.memory.working_target = flag.name;
+            }
+            else {
+                creep.memory.working = 'massattack_room';
+                creep.memory.working_target = null;
+            }
+        },
+
     },
 
-    [CONSTS.SOLDIER_ROLE_SAPPER]:
+    [SOLDIER_ROLE.SAPPER]:
     {
         new: function (base, version) {
             var parts = [];
@@ -574,8 +397,8 @@ var roleSoldier = {
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_SOLDIER,
-                        role: CONSTS.SOLDIER_ROLE_SAPPER,
+                        creepType: CREEP_TYPE.SOLDIER,
+                        role: SOLDIER_ROLE.SAPPER,
                         base: base.name,
                         group: 1,
                         working: '',
@@ -592,9 +415,47 @@ var roleSoldier = {
             }
         },
 
+        arrange_work: function (creep) {
+            var flag = null;
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == SECGROUP[creep.memory.role]
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == COLOR_RED
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (flag && flag.secondaryColor == COLOR_WHITE) {
+                creep.memory.working = 'move_pos';
+                creep.memory.working_target = flag.name;
+            }
+            else if (flag) {
+                creep.memory.working = 'dismantle_area';
+                creep.memory.working_target = flag.name;
+            }
+            else {
+                creep.memory.working = 'dismantle_room';
+                creep.memory.working_target = null;
+            }
+        },
+
     },
 
-    [CONSTS.SOLDIER_ROLE_MEDIC]:
+    [SOLDIER_ROLE.MEDIC]:
     {
         new: function (base, version) {
             var parts = [];
@@ -618,8 +479,8 @@ var roleSoldier = {
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_SOLDIER,
-                        role: CONSTS.SOLDIER_ROLE_MEDIC,
+                        creepType: CREEP_TYPE.SOLDIER,
+                        role: SOLDIER_ROLE.MEDIC,
                         base: base.name,
                         group: 1,
                         working: '',
@@ -636,9 +497,47 @@ var roleSoldier = {
             }
         },
 
+        arrange_work: function (creep) {
+            var flag = null;
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == SECGROUP[creep.memory.role]
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == COLOR_RED
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (flag && flag.secondaryColor == COLOR_WHITE) {
+                creep.memory.working = 'move_pos';
+                creep.memory.working_target = flag.name;
+            }
+            else if (flag) {
+                creep.memory.working = 'heal_area';
+                creep.memory.working_target = flag.name;
+            }
+            else {
+                creep.memory.working = 'heal_area';
+                creep.memory.working_target = null;
+            }
+        },
+
     },
 
-    [CONSTS.SOLDIER_ROLE_CLAIMER]: {
+    [SOLDIER_ROLE.CLAIMER]: {
         new: function (base, version) {
             var parts = [];
             switch (version) {
@@ -661,8 +560,8 @@ var roleSoldier = {
                 {
                     memory:
                     {
-                        creepType: CONSTS.CREEP_TYPE_SOLDIER,
-                        role: CONSTS.SOLDIER_ROLE_CLAIMER,
+                        creepType: CREEP_TYPE.SOLDIER,
+                        role: SOLDIER_ROLE.CLAIMER,
                         base: base.name,
                         group: 1,
                         working: '',
@@ -679,7 +578,46 @@ var roleSoldier = {
             if (retCreep == 0) {
                 console.log('SUCCESS: Spawning new ', Game.creeps[newName].memory.role, ' : ', newName);
             }
-        },
+        }, //new
+
+        arrange_work: function (creep) {
+            var flag = null;
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == SECGROUP[creep.memory.role]
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (!flag) {
+                var flags = _.filter(Game.flags,
+                    (flag) => {
+                        return flag.color == creep.memory.group
+                            && flag.secondaryColor == COLOR_RED
+                    }
+                );
+                if (flags.length > 0) {
+                    flag = flags[0];
+                }
+            }
+            if (flag && flag.secondaryColor == COLOR_WHITE) {
+                creep.memory.working = 'move_pos';
+                creep.memory.working_target = flag.name;
+            }
+            else if (flag) {
+                creep.memory.working = 'claim_area';
+                creep.memory.working_target = flag.name;
+            }
+            else {
+                creep.memory.working = 'claim_room';
+                creep.memory.working_target = null;
+            }
+        }, //arrange_work 
+
     },
 
 
