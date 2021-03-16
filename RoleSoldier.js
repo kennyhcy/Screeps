@@ -34,6 +34,14 @@ var roleSoldier = {
         if (creep.memory.working) {
             fight[creep.memory.working](creep);
         }
+
+        if (!creep.memory.working) {
+            this[creep.memory.role].arrange_work(creep); // 跑两遍 不发呆
+            if (creep.memory.working) {
+                fight[creep.memory.working](creep);
+            }
+        }
+
     },
 
     [SOLDIER_ROLE.TANK]:

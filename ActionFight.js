@@ -302,7 +302,7 @@ var fight = {
             if (ret != 0 && creep.memory.claimer_action == 'sign') {
                 ret = creep.signController(target, creep.memory.claimer_sign_text);
                 creep.say(creep.memory.claimer_sign_text);
-                creep.claimer_action == null;
+                creep.memory.claimer_action == null;
             }
         }
     },
