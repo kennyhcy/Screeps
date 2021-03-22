@@ -55,6 +55,27 @@ var baseLink = {
         };
 
 
+        // 如果满足消耗需求 仍然有库存多余, 则看板入库
+        if (memory && memory.role == LINK_ROLE.CENTER) {
+            if (link.store[RESOURCE_ENERGY] > 0) {
+                memory['request'] = true;
+                memory['creep'] = null;
+            }
+            else {
+                memory['request'] = false;
+                memory['creep'] = null;
+            }
+        }
+
+        //如果creep半路死了, 则重置看板
+        if (memory['creep']) {
+            let check = Game.creeps[memory['creep']];
+            if (!check) {
+                memory['creep'] = null;
+            }
+        }
+
+
     },
 }
 

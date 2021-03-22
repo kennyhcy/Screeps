@@ -1,3 +1,6 @@
+// ActionFight.js
+
+
 var fight = {
     move_pos: function (creep) {
         var flag = Game.flags[creep.memory.working_target];
