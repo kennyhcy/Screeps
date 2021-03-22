@@ -284,7 +284,7 @@ var fight = {
         if (flag.room) {
             var target = flag.room.controller;
         }
-        if (target && creep.pos.inRangeTo(target, 3)) {
+        if (target && creep.pos.inRangeTo(target, 3) && !target.my) {
             creep.moveTo(target);
             // claimer_action
             if (ret != 0 && creep.memory.claimer_action == 'claim') {
@@ -299,18 +299,23 @@ var fight = {
                 ret = creep.reserveController(target);
                 //console.log('reserveController:', ret);
             }
-            if (ret != 0 && creep.memory.claimer_action == 'sign') {
-                ret = creep.signController(target, creep.memory.claimer_sign_text);
-                creep.say(creep.memory.claimer_sign_text);
-                creep.memory.claimer_action == null;
-            }
+        }
+        if (ret != 0 && creep.memory.claimer_action == 'sign') {
+            ret = creep.signController(target, creep.memory.claimer_sign_text);
+            creep.say(creep.memory.claimer_sign_text);
+            creep.memory.claimer_action == null;
         }
     },
 
     claim_room: function (creep) {
-        var working_room = creep.room;
-        var target = working_room.controller;
+        var working_room = Game.rooms[creep.memory.working_room];
         var ret = -99;
+
+        var target = working_room.controller;
+        if (!target) {
+            // target = creep.room.findExitTo(working_room);
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.working_room));
+        }
 
         if (target) {
             creep.moveTo(target);
@@ -327,11 +332,11 @@ var fight = {
                 ret = creep.reserveController(target);
                 //console.log('reserveController:', ret);
             }
-            if (ret != 0 && creep.memory.claimer_action == 'sign') {
-                ret = creep.signController(target, creep.memory.claimer_sign_text);
-                creep.say(creep.memory.claimer_sign_text);
-                creep.memory.claimer_action == null;
-            }
+        }
+        if (ret != 0 && creep.memory.claimer_action == 'sign') {
+            ret = creep.signController(target, creep.memory.claimer_sign_text);
+            creep.say(creep.memory.claimer_sign_text);
+            creep.memory.claimer_action == null;
         }
     },
 

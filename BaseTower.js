@@ -1,28 +1,31 @@
 // BaseTower.js
 // 2021-03-15
 
-var CONSTS = require('Sys').CONSTS;
-        // // Tower roles:
-        // TOWER_ROLE_NORMAL: 'normal',
-        // TOWER_ROLE_MILITARY_ONLY: 'military_only',
-        // TOWER_ROLE_CIVILIAN_ONLY: 'civilian_only',
+// Tower roles:
+const TOWER_ROLE = {
+    NORMAL: 'normal',
+    MILITARY_ONLY: 'military_only',
+    CIVILIAN_ONLY: 'civilian_only',
+}
 
 var baseTower = {
+    TOWER_ROLE: TOWER_ROLE,
+    
     run: function (tower) {
         var tower_role = Memory.towers[tower.id].role;
 
-        if (tower_role == CONSTS.TOWER_ROLE_NORMAL) {
+        if (tower_role == TOWER_ROLE.NORMAL) {
             var ret = this._attack(tower);
             if (!ret) {
                 var ret = this._repair(tower);
             }
         }
 
-        if (tower_role == CONSTS.SPAWN_ROLE_MILITARY_ONLY) {
+        if (tower_role == TOWER_ROLE.MILITARY_ONLY) {
             var ret = this._attack(tower);
         }
 
-        if (tower_role == CONSTS.SPAWN_ROLE_CIVILIAN_ONLY) {
+        if (tower_role == TOWER_ROLE.CIVILIAN_ONLY) {
             var ret = this._repair(tower);
         }
     },
@@ -44,7 +47,7 @@ var baseTower = {
             var targets = tower.room.find(FIND_MY_STRUCTURES, {
                 filter: (structure) => {
                     return structure.hits < structure.hitsMax
-                    //&& structure.hits < 1000000
+                        && structure.hits < 1000000  //1m
                 }
             });
             if (targets.length > 0) {
@@ -70,7 +73,7 @@ var baseTower = {
                         || structure.structureType == STRUCTURE_CONTAINER
                         || structure.structureType == STRUCTURE_STORAGE
                     ) && structure.hits < structure.hitsMax
-                        && structure.hits < 1000000
+                        && structure.hits < 1000000  // 1m
                 }
             });
         };

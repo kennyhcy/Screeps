@@ -29,7 +29,15 @@ const SECGROUP = {
 };
 
 var roleSoldier = {
+    SOLDIER_ROLE: SOLDIER_ROLE,
+
     run: function (creep) {
+        // 统计数量
+        var working_room = creep.memory.working_room;
+        var creep_role = creep.memory.role;
+        // Game.rooms[working_room].memory.soldierCount[creep_role] += 1;
+        Memory.rooms[working_room].soldierCount[creep_role] += 1;
+
         this[creep.memory.role].arrange_work(creep);
         if (creep.memory.working) {
             fight[creep.memory.working](creep);
@@ -46,7 +54,7 @@ var roleSoldier = {
 
     [SOLDIER_ROLE.TANK]:
     {
-        new: function (base, version) {
+        new: function (base, working_room, level) {
             var parts = [];
             switch (version) {
                 case 1:
@@ -70,7 +78,7 @@ var roleSoldier = {
                     parts = [TOUGH, MOVE];
             }
 
-            var newName = 'ST-' + version + '-' + Game.time;
+            var newName = 'ST-' + version + '-' + Game.time % 1000;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
@@ -83,7 +91,7 @@ var roleSoldier = {
                         working_target: null,
                         harvest_source: null,
                         base_room: base.room.name,
-                        working_room: base.room.name,
+                        working_room: working_room,
                     }
                 });
 
@@ -135,7 +143,7 @@ var roleSoldier = {
 
     [SOLDIER_ROLE.COMMANDO]:
     {
-        new: function (base, version) {
+        new: function (base, working_room, level) {
             var parts = [];
             switch (version) {
                 case 1:
@@ -152,7 +160,7 @@ var roleSoldier = {
                     parts = [ATTACK, MOVE];
             }
 
-            var newName = 'SC-' + version + '-' + Game.time;
+            var newName = 'SC-' + version + '-' + Game.time % 1000;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
@@ -165,7 +173,7 @@ var roleSoldier = {
                         working_target: null,
                         harvest_source: null,
                         base_room: base.room.name,
-                        working_room: base.room.name,
+                        working_room: working_room,
                     }
                 });
 
@@ -185,7 +193,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (!flag) {
@@ -196,7 +204,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (flag && flag.secondaryColor == COLOR_WHITE) {
@@ -217,7 +225,7 @@ var roleSoldier = {
 
     [SOLDIER_ROLE.SHOOTER]:
     {
-        new: function (base, version) {
+        new: function (base, working_room, version) {
             var parts = [];
             switch (version) {
                 case 1:
@@ -234,7 +242,7 @@ var roleSoldier = {
                     parts = [RANGED_ATTACK, MOVE];
             }
 
-            var newName = 'SS-' + version + '-' + Game.time;
+            var newName = 'SS-' + version + '-' + Game.time % 1000;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
@@ -247,7 +255,7 @@ var roleSoldier = {
                         working_target: null,
                         harvest_source: null,
                         base_room: base.room.name,
-                        working_room: base.room.name,
+                        working_room: working_room,
                     }
                 });
 
@@ -267,7 +275,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (!flag) {
@@ -278,7 +286,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (flag && flag.secondaryColor == COLOR_WHITE) {
@@ -299,7 +307,7 @@ var roleSoldier = {
 
     [SOLDIER_ROLE.ARTILLERY]:
     {
-        new: function (base, version) {
+        new: function (base, working_room, version) {
             var parts = [];
             switch (version) {
                 case 1:
@@ -316,7 +324,7 @@ var roleSoldier = {
                     parts = [RANGED_ATTACK, MOVE];
             }
 
-            var newName = 'SA-' + version + '-' + Game.time;
+            var newName = 'SA-' + version + '-' + Game.time % 1000;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
@@ -329,7 +337,7 @@ var roleSoldier = {
                         working_target: null,
                         harvest_source: null,
                         base_room: base.room.name,
-                        working_room: base.room.name,
+                        working_room: working_room,
                     }
                 });
 
@@ -350,7 +358,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (!flag) {
@@ -361,7 +369,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (flag && flag.secondaryColor == COLOR_WHITE) {
@@ -382,7 +390,7 @@ var roleSoldier = {
 
     [SOLDIER_ROLE.SAPPER]:
     {
-        new: function (base, version) {
+        new: function (base, working_room, version) {
             var parts = [];
             switch (version) {
                 case 1:
@@ -399,7 +407,7 @@ var roleSoldier = {
                     parts = [WORK, MOVE];
             }
 
-            var newName = 'SP-' + version + '-' + Game.time;
+            var newName = 'SP-' + version + '-' + Game.time % 1000;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
@@ -412,7 +420,7 @@ var roleSoldier = {
                         working_target: null,
                         harvest_source: null,
                         base_room: base.room.name,
-                        working_room: base.room.name,
+                        working_room: working_room,
                     }
                 });
 
@@ -432,7 +440,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (!flag) {
@@ -443,7 +451,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (flag && flag.secondaryColor == COLOR_WHITE) {
@@ -464,7 +472,7 @@ var roleSoldier = {
 
     [SOLDIER_ROLE.MEDIC]:
     {
-        new: function (base, version) {
+        new: function (base, working_room, version) {
             var parts = [];
             switch (version) {
                 case 1:
@@ -481,7 +489,7 @@ var roleSoldier = {
                     parts = [HEAL, MOVE];
             }
 
-            var newName = 'SM-' + version + '-' + Game.time;
+            var newName = 'SM-' + version + '-' + Game.time % 1000;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
@@ -494,7 +502,7 @@ var roleSoldier = {
                         working_target: null,
                         harvest_source: null,
                         base_room: base.room.name,
-                        working_room: base.room.name,
+                        working_room: working_room,
                     }
                 });
 
@@ -514,7 +522,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (!flag) {
@@ -525,7 +533,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (flag && flag.secondaryColor == COLOR_WHITE) {
@@ -545,7 +553,7 @@ var roleSoldier = {
     },
 
     [SOLDIER_ROLE.CLAIMER]: {
-        new: function (base, version) {
+        new: function (base, working_room, version) {
             var parts = [];
             switch (version) {
                 case 1:
@@ -562,7 +570,7 @@ var roleSoldier = {
                     parts = [CLAIM, MOVE];
             }
 
-            var newName = 'SCLM-' + version + '-' + Game.time;
+            var newName = 'SCLM-' + version + '-' + Game.time % 1000;
             var retCreep = base.spawnCreep(parts, newName,
                 {
                     memory:
@@ -575,8 +583,8 @@ var roleSoldier = {
                         working_target: null,
                         harvest_source: null,
                         base_room: base.room.name,
-                        working_room: base.room.name,
-                        claimer_action: 'sign', //'reserve', 'claim' , 'sign'
+                        working_room: working_room,
+                        claimer_action: 'reserve', //'attack', 'reserve', 'claim' , 'sign'
                         claimer_sign_text: 'Peace & Love!',
                     }
                 });
@@ -597,7 +605,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (!flag) {
@@ -608,7 +616,7 @@ var roleSoldier = {
                     }
                 );
                 if (flags.length > 0) {
-                    flag = flags[0];
+                    flag = flags[flags.length - 1];
                 }
             }
             if (flag && flag.secondaryColor == COLOR_WHITE) {

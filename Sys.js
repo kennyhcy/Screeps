@@ -1,98 +1,107 @@
 //Sys.js
 //2021-03-15
 
+var WORKER_ROLE = require('RoleWorker').WORKER_ROLE;
+var SOLDIER_ROLE = require('RoleSoldier').SOLDIER_ROLE;
+
 var sys = {
-
-    CONSTS: {
-        //Creep Types:
-        CREEP_TYPE_WORKER: 'worker',
-        CREEP_TYPE_SOLDIER: 'soldier',
-
-        //Creep Roles:
-        WORKER_ROLE_HARVESTER: 'harvester',
-        WORKER_ROLE_ENGINEER: 'engineer',
-        WORKER_ROLE_UPGRADER: 'upgrader',
-        WORKER_ROLE_TRANSFER: 'transfer',
-        WORKER_ROLE_STOREKEEPER: 'storekeeper',
-
-        SOLDIER_ROLE_TANK: 'tank',
-        SOLDIER_ROLE_COMMANDO: 'commando',
-        SOLDIER_ROLE_SHOOTER: 'shooter',
-        SOLDIER_ROLE_ARTILLERY: 'artillery',
-        SOLDIER_ROLE_SAPPER: 'sapper',
-        SOLDIER_ROLE_CLAIMER: 'claimer',
-        SOLDIER_ROLE_MEDIC: 'medic',
-
-        // Spawn roles:
-        SPAWN_ROLE_NORMAL: 'normal',
-        SPAWN_ROLE_MILITARY_FIRST: 'military_first',
-        SPAWN_ROLE_MILITARY_ONLY: 'military_only',
-        SPAWN_ROLE_CIVILIAN_ONLY: 'civilian_only',
-
-        // Tower roles:
-        TOWER_ROLE_NORMAL: 'normal',
-        TOWER_ROLE_MILITARY_ONLY: 'military_only',
-        TOWER_ROLE_CIVILIAN_ONLY: 'civilian_only',
-
-        // link roles:
-        LINK_ROLE_NORMAL: 'normal', // consumer site
-        LINK_ROLE_HARVEST_SITE: 'harvest_site',
-        LINK_ROLE_CENTER: 'center',
-
-    },
-
-
-    run: function () {
-
-    },
-
-
     initialSettings: function () {
         /*** room settings ***/
         if (!Memory.rooms) {
             Memory.rooms = {}
         }
         for (var r in Game.rooms) {
-            if (Game.rooms[r].controller.my) {
-                if (!Memory.rooms[r]) { // 初始化设置
-                    Memory.rooms[r] = {};
-                    Memory.rooms[r]['resourceSetting'] = {};
-                    var sources = Game.rooms[r].find(FIND_SOURCES);
-                    for (var s in sources) {
-                        var sid = sources[s].id;
-                        Memory.rooms[r]['resourceSetting'][sid] = 0; // 各个能量点允许多少creep
-                    }
+            // if (Game.rooms[r].controller && Game.rooms[r].controller.my) {
+            if (!Memory.rooms[r]) { // 初始化设置
+                Memory.rooms[r] = {};
+            }
+
+            // resourceSettings
+            if (!Memory.rooms[r]['resourceSetting']) {
+                Memory.rooms[r]['resourceSetting'] = {};
+                var sources = Game.rooms[r].find(FIND_SOURCES);
+                for (var s in sources) {
+                    var sid = sources[s].id;
+                    Memory.rooms[r]['resourceSetting'][sid] = 0; // 各个能量点允许多少creep
+                }
+                var minerals = Game.rooms[r].find(FIND_MINERALS);
+                for (var s in minerals) {
+                    var sid = minerals[s].id;
+                    Memory.rooms[r]['resourceSetting'][sid] = 0; // 各个矿点允许多少creep
                 }
             }
+
+            // Syn. workerSetting
+            if (!Memory.rooms[r]['workerSetting']) {
+                Memory.rooms[r]['workerSetting'] = {};
+                Memory.rooms[r]['worker_level'] = 1;
+            }
+            var workerSetting = {};
+            for (let rr in WORKER_ROLE) {
+                let role = WORKER_ROLE[rr];
+                workerSetting[role] = Memory.rooms[r]['workerSetting'][role];
+                if (!workerSetting[role]) {
+                    workerSetting[role] = 0;
+                }
+            }
+            Memory.rooms[r]['workerSetting'] = workerSetting;
+
+            // 同步 soldierSetting
+            if (!Memory.rooms[r]['soldierSetting']) {
+                Memory.rooms[r]['soldierSetting'] = {};
+                Memory.rooms[r]['soldier_level'] = 1;
+            }
+            var soldierSetting = {};
+            for (let rr in SOLDIER_ROLE) {
+                let role = SOLDIER_ROLE[rr];
+                soldierSetting[role] = Memory.rooms[r]['soldierSetting'][role];
+                if (!soldierSetting[role]) {
+                    soldierSetting[role] = 0;
+                }
+            }
+
+            if (!Memory.rooms[r]['terminal']) {
+                Memory.rooms[r]['terminal'] = {
+                    request: {
+                        [RESOURCE_ENERGY]: 0,
+                        [RESOURCE_KEANIUM]: 0,
+                    },
+                    back: {
+                        [RESOURCE_ENERGY]: 0,
+                        [RESOURCE_KEANIUM]: 0,
+                    }
+                };
+            }
+
+            // 每 tick 把统计清零
+            Memory.rooms[r]['workerCount'] = {};
+            for (let rr in WORKER_ROLE) {
+                let role = WORKER_ROLE[rr];
+                Memory.rooms[r]['workerCount'][role] = 0;
+            }
+
+            Memory.rooms[r]['soldierCount'] = {};
+            for (let rr in SOLDIER_ROLE) {
+                let role = SOLDIER_ROLE[rr];
+                Memory.rooms[r]['soldierCount'][role] = 0;
+            }
+            // }
         };
+
         /*** spawn settings ***/
         if (!Memory.spawns) {
             Memory.spawns = {}
         }
-        for (var s in Game.spawns) {
-            if (!Memory.spawns[s]) {
-                Memory.spawns[s] = {};
-                Memory.spawns[s]['workerSetting'] = {
-                    [this.CONSTS.WORKER_ROLE_HARVESTER]: 0,
-                    [this.CONSTS.WORKER_ROLE_ENGINEER]: 0,
-                    [this.CONSTS.WORKER_ROLE_UPGRADER]: 0,
-                    [this.CONSTS.WORKER_ROLE_TRANSFER]: 0,
-                    [this.CONSTS.WORKER_ROLE_STOREKEEPER]: 0,
-                };
-                Memory.spawns[s]['soldierSetting'] = {
-                    [this.CONSTS.SOLDIER_ROLE_TANK]: 0,
-                    [this.CONSTS.SOLDIER_ROLE_COMMANDO]: 0,
-                    [this.CONSTS.SOLDIER_ROLE_SHOOTER]: 0,
-                    [this.CONSTS.SOLDIER_ROLE_ARTILLERY]: 0,
-                    [this.CONSTS.SOLDIER_ROLE_SAPPER]: 0,
-                    [this.CONSTS.SOLDIER_ROLE_MEDIC]: 0,
-                    [this.CONSTS.SOLDIER_ROLE_CLAIMER]: 0,
-                };
-                Memory.spawns[s]['role'] = this.CONSTS.SPAWN_ROLE_NORMAL;
-                Memory.spawns[s]['worker_level'] = 1;
-                Memory.spawns[s]['soldier_level'] = 1;
+        for (let s in Game.spawns) {
+            var spawn = Game.spawns[s];
+            if (!spawn.memory) {
+                spawn.memory = {};
+                spawn.memory['role'] = 'normal';
+                spawn.memory['working_rooms'] = [
+                    spawn.room.name
+                ];
             }
-        };
+        }
 
         /*** tower / link settings ***/
         if (!Memory.towers) {
@@ -107,7 +116,7 @@ var sys = {
             if (struct.structureType == STRUCTURE_TOWER) {
                 if (!Memory.towers[s]) {
                     Memory.towers[s] = {};
-                    Memory.towers[s].role = this.CONSTS.TOWER_ROLE_NORMAL;
+                    Memory.towers[s].role = 'normal';
                 }
             }
 
@@ -115,12 +124,19 @@ var sys = {
             if (struct.structureType == STRUCTURE_LINK) {
                 if (!Memory.links[s]) {
                     Memory.links[s] = {};
-                    Memory.links[s].role = this.CONSTS.LINK_ROLE_NORMAL;
+                    Memory.links[s].role = 'normal';
                 }
             }
         }
+        //console.log(Game.time, ' Mod100 : ', Game.time % 100);
+        if (Game.time % 100 == 0) {
+            console.log('Bucket:', Game.cpu.bucket)
+        }
+        if (Game.cpu.bucket >= 10000) {
+            var ret = Game.cpu.generatePixel();
+            console.log('generatePixel : ', ret);
+        }
     },
-
 
     cleansing: function () {
         /*** Cleansing ***/
@@ -151,23 +167,23 @@ var sys = {
         };
     },
 
-
-
-
-
-
     arrange_harvester: function () {
         // 每个资源点有几个creep
         var current = {};
         for (var r in Game.rooms) {
             var room = Game.rooms[r];
-            if (room.controller && room.controller.my) {
-                var sources = room.find(FIND_SOURCES);
-                for (var s in sources) {
-                    var source = sources[s];
-                    current[source.id] = 0;
-                }
+
+            var sources = room.find(FIND_SOURCES);
+            for (var s in sources) {
+                var source = sources[s];
+                current[source.id] = 0;
             }
+            var minerals = room.find(FIND_MINERALS);
+            for (var s in minerals) {
+                var source = minerals[s];
+                current[source.id] = 0;
+            }
+
         }
 
         for (var c in Game.creeps) {
@@ -184,11 +200,9 @@ var sys = {
         var settings = {};
         for (var r in Game.rooms) {
             var room = Game.rooms[r];
-            if (room.controller && room.controller.my) {
-                var resourceSetting = Memory.rooms[r].resourceSetting;
-                for (var r in resourceSetting) {
-                    settings[r] = resourceSetting[r];
-                }
+            var resourceSetting = Memory.rooms[r].resourceSetting;
+            for (var r in resourceSetting) {
+                settings[r] = resourceSetting[r];
             }
         }
 
@@ -205,22 +219,28 @@ var sys = {
             if (curr > sett) { // 资源点creep数量多于设置的， 找一个清空目标点， 反正多次循环嘛 
 
                 var tcreeps = _.filter(Game.creeps, (creep) =>
-                    creep.memory.role == this.CONSTS.WORKER_ROLE_HARVESTER
+                    creep.memory.role == WORKER_ROLE.HARVESTER
                     && creep.memory.harvest_source == c
                 );
 
                 if (tcreeps.length > 0) {
                     // tcreeps[0].memory.harvest_source = undefined;
                     tcreeps[0].memory.harvest_source = null;
+                    tcreeps[0].memory.working = null;
+                    tcreeps[0].memory.working_target = null;
                 }
             }
+
+            //console.log(c, sett, ' : ', curr)
 
             if (sett > curr) { // 资源点creep小于设置的， 找空目标的creep分配过来, 一个就行， 反正要循环嘛
 
                 var source_room = Game.getObjectById(c).room;
 
+                //console.log(source_room.name);
+
                 var tcreeps = _.filter(Game.creeps, (creep) =>
-                    creep.memory.role == this.CONSTS.WORKER_ROLE_HARVESTER
+                    creep.memory.role == WORKER_ROLE.HARVESTER
                     && !creep.memory.harvest_source
                     && creep.memory.working_room == source_room.name
                 );
@@ -234,8 +254,6 @@ var sys = {
         // 剩下的creep目标点为空的，就空着吧， creep无任务时加提示
 
     },
-
-
 
     userCommand: function () {
         //console.log(Game.time);

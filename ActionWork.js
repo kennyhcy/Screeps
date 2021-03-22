@@ -1,7 +1,12 @@
 var work = {
+    carry: function (creep) { },
     harvest: function (creep) {
         var target = Game.getObjectById(creep.memory.working_target);
-        if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+        if (!target && creep.room.name != creep.memory.working_room) {
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.working_room));
+        }
+
+        if (creep.store.getFreeCapacity() > 0
             && target) {
 
             var ret = creep.harvest(target);
@@ -21,11 +26,34 @@ var work = {
     },
 
     store: function (creep) {
-        target = Game.getObjectById(creep.memory.working_target);
+        var target = Game.getObjectById(creep.memory.working_target);
+        // if (!target && creep.room.name != creep.memory.working_room) {
+        //     creep.moveTo(new RoomPosition(25, 25, creep.memory.working_room));
+        // }
         if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
             && target && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
 
             var ret = creep.transfer(target, RESOURCE_ENERGY);
+            if (ret == OK || ret == ERR_BUSY) {
+                // console.log('Check point1');
+            }
+            else if (ret == ERR_NOT_IN_RANGE) {
+                creep.moveTo(target);
+            }
+            else {
+                //console.log('ERROR : ', creep.name, ' store fail: ', ret);
+            }
+        }
+        else if (creep.store.getUsedCapacity() > 0
+            && target && target.store.getFreeCapacity() > 0) {
+
+            for (var source of RESOURCES_ALL) {
+                if (creep.store[source] > 0) {
+                    //console.log(source, creep.store[source]);
+                    break;
+                }
+            }
+            var ret = creep.transfer(target, source);
             if (ret == OK || ret == ERR_BUSY) {
                 // console.log('Check point1');
             }
@@ -45,6 +73,9 @@ var work = {
     pickup: function (creep) {
         var target = Game.getObjectById(creep.memory.working_target);
         //console.log('check point 348', target);
+        if (!target && creep.room.name != creep.memory.working_room) {
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.working_room));
+        }
         if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
             && target
             && target.resourceType == RESOURCE_ENERGY
@@ -69,6 +100,9 @@ var work = {
 
     withdraw: function (creep) {
         var target = Game.getObjectById(creep.memory.working_target);
+        if (!target && creep.room.name != creep.memory.working_room) {
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.working_room));
+        }
         if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0
             && target
             && target.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
@@ -83,6 +117,25 @@ var work = {
             else {
                 //console.log('ERROR : ', creep.name, ' withdraw fail: ', ret);
             }
+        // } else if (creep.memory.working_resource && creep.store.getFreeCapacity() > 0 && target
+        //     && target.store.getUsedCapacity() > 0) {
+
+        //     for (var source of RESOURCES_ALL) {
+        //         if (target.store[source] > 0) {
+        //             //console.log(source, creep.store[source]);
+        //             break;
+        //         }
+        //     }
+        //     var ret = creep.withdraw(target, source);
+        //     if (ret == OK || ret == ERR_BUSY) {
+        //         // console.log('Check point1');
+        //     }
+        //     else if (ret == ERR_NOT_IN_RANGE) {
+        //         creep.moveTo(target);
+        //     }
+        //     else {
+        //         //console.log('ERROR : ', creep.name, ' withdraw fail: ', ret);
+        //     }
         }
         else {
             creep.memory.working = null;
@@ -92,6 +145,9 @@ var work = {
 
     build: function (creep) {
         var target = Game.getObjectById(creep.memory.working_target);
+        if (!target && creep.room.name != creep.memory.working_room) {
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.working_room));
+        }
         if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
             && target) {
 
@@ -111,6 +167,9 @@ var work = {
 
     refill: function (creep) {
         var target = Game.getObjectById(creep.memory.working_target);
+        if (!target && creep.room.name != creep.memory.working_room) {
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.working_room));
+        }
         if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
             && target
             && target.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
@@ -132,6 +191,9 @@ var work = {
 
     repair: function (creep) {
         var target = Game.getObjectById(creep.memory.working_target);
+        if (!target && creep.room.name != creep.memory.working_room) {
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.working_room));
+        }
         if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
             && target
             && target.hits < target.hitsMax) {
@@ -152,14 +214,20 @@ var work = {
 
     upgrade: function (creep) {
         var target = Game.getObjectById(creep.memory.working_target);
+        if (!target && creep.room.name != creep.memory.working_room) {
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.working_room));
+        }
         if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0
             && target) {
 
+            if (creep.pos.getRangeTo(target) > 2) {
+                creep.moveTo(target);
+            }
             var ret = creep.upgradeController(target);
             if (ret == OK || ret == ERR_BUSY) {
                 // console.log('Check point1');
             } else if (ret == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
+                // creep.moveTo(target);
             } else {
                 //console.log('ERROR : ', creep.name, ' upgradeController fail: ', ret);
             }

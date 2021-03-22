@@ -1,13 +1,16 @@
 //BaseLink
 //2021-03-15
 
-// var CONSTS = require('Sys').CONSTS;
+
 // link roles:
-// LINK_ROLE_NORMAL: 'normal', // consumer site
-// LINK_ROLE_HARVEST_SITE: 'harvest_site',
-// LINK_ROLE_CENTER: 'center',
+const LINK_ROLE = {
+    NORMAL: 'normal', // consumer site
+    HARVEST_SITE: 'harvest_site',
+    CENTER: 'center',
+}
 
 var baseLink = {
+    LINK_ROLE: LINK_ROLE,
     run: function (link) {
         var memory = null;
         if (!Memory.links[link.id]) {
@@ -17,14 +20,14 @@ var baseLink = {
             //console.log(memory);
         }
 
-        if (memory && memory.role == 'harvest_site'
-            && link.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+        if (memory && memory.role == LINK_ROLE.HARVEST_SITE
+            && link.store.getUsedCapacity(RESOURCE_ENERGY) > 400) {
             // console.log('check');
             var targets = link.room.find(FIND_MY_STRUCTURES, {
                 filter: (center) => {
                     return center.structureType == STRUCTURE_LINK
                         && Memory.links[center.id]
-                        && Memory.links[center.id].role == 'center'
+                        && Memory.links[center.id].role == LINK_ROLE.CENTER
                         && center.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                 }
             });
@@ -34,14 +37,14 @@ var baseLink = {
         };
 
 
-        if (memory && memory.role == 'center'
+        if (memory && memory.role == LINK_ROLE.CENTER
             && link.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
             // console.log('check');
             var targets = link.room.find(FIND_MY_STRUCTURES, {
                 filter: (center) => {
                     return center.structureType == STRUCTURE_LINK
                         && Memory.links[center.id]
-                        && Memory.links[center.id].role == 'normal'
+                        && Memory.links[center.id].role == LINK_ROLE.NORMAL
                         && center.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                 }
             });
