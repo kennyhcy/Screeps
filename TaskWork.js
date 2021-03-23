@@ -1,70 +1,131 @@
 // TaskWork.js
 
-const task = {
-    carry: function (icreep) {
-        var creep = Game.creeps[icreep.name];
-        var working_from = Game.getObjectById(creep.memory.working_from);
-        var working_to = Game.getObjectById(creep.memory.working_to);
-        var resource_type = creep.memory.working_resource;
-        //console.log('check3',resource_type);
+const TASK = {
+    assign: function (action, from, to, rt, step = 0) {
+        var task = {
+            action: action,
+            from: from,
+            to: to,
+            rt: rt,
+            step: step,
+        };
+        return task;
+    },
 
-        if (!creep.memory.working_step) {
-            creep.memory.working_step = 1;
+    execute: function (creep) {
+        // var creep = Game.creeps[icreep.name];
+        if (!creep.memory.task || !creep.memory.task.action) {
+            creep.memory.task = undefined;
+            return;
+        }
+        if (!creep.memory.task.step || creep.memory.task.step <= 0) {
+            creep.memory.task.step = 1;
         }
 
-        if (creep.memory.working_step == 1) {
-            if (creep.store[resource_type] <= 0) {
-                if (creep.withdraw(working_from, resource_type) != 0) {
-                    creep.moveTo(working_from);
-                }
-                else {
-                    creep.memory.working_step += 1;
-                }
-            }
+        if (task.action == 'carry') {
+            this._task_carry(creep);
         }
 
-        if (creep.memory.working_step == 2) {
-            if (creep.transfer(working_to, resource_type) != 0) {
-                creep.moveTo(working_to);
-            }
-            if (creep.store[resource_type] <= 0) {
-                creep.memory.working = null;
-                creep.memory.working_step = null;
-            }
+        if (task.action == 'pickup') {
+            this._task_pickup(creep);
         }
     },
 
-    pickup: function (icreep) {
-        var creep = Game.creeps[icreep.name];
-        var working_from = Game.getObjectById(creep.memory.working_from);
-        var working_to = Game.getObjectById(creep.memory.working_to);
-        var resource_type = creep.memory.working_resource;
-        //console.log('check3',resource_type);
+    _withdraw: function (creep, tid, rt) {
+        let ret = -99;
+        let target = Game.getObjectById(tid);
+        if (!target) {
+            return -99;
+        }
+        if (creep.store.getFreeCapacity(rt) <= 0) {
+            return -99;
+        }
+        ret = creep.withdraw(target, rt);
+        if (ret == ERR_NOT_IN_RANGE) {
+            ret = creep.moveTo(target);
+        }
+        return ret;
+    },
 
-        if (!creep.memory.working_step) {
-            creep.memory.working_step = 1;
+    _pickup: function (creep, tid, rt) {
+        let ret = -99;
+        let target = Game.getObjectById(tid);
+        if (!target) {
+            return -99;
+        }
+        if (rt != target.resource_type) {
+            return -97;
+        }
+        if (creep.store.getFreeCapacity(rt) <= 0) {
+            return -98;
+        }
+        ret = creep.pickup(target);
+        if (ret == ERR_NOT_IN_RANGE) {
+            ret = creep.moveTo(target);
+        }
+        return ret;
+    },
+
+    _transfer: function (creep, tid, rt) {
+        let ret = -99;
+        let target = Game.getObjectById(tid);
+        if (!target) {
+            ret = -99;
+            return ret;
+        }
+        if (creep.store[rt] <= 0) {
+            ret = -98;
+            return ret;
+        }
+        ret = creep.transfer(target, rt);
+        if (ret == ERR_NOT_IN_RANGE) {
+            ret = creep.moveTo(target);
+        }
+        return ret;
+    },
+
+
+
+    _task_carry: function (creep) {
+        var task = creep.memory.task;
+        var ret;
+
+        if (task.step <= 1) {
+            ret = this._withdraw(creep, task.from, task.rt);
         }
 
-        if (creep.memory.working_step == 1) {
-            if (creep.store[resource_type] <= 0) {
-                if (creep.pickup(working_from) != 0) {
-                    creep.moveTo(working_from);
-                }
-                else {
-                    creep.memory.working_step += 1;
-                }
-            }
+        if (ret == 0 && creep.store[task.rt] > 0) {
+            task.step = 2;
         }
 
-        if (creep.memory.working_step == 2) {
-            if (creep.transfer(working_to, resource_type) != 0) {
-                creep.moveTo(working_to);
-            }
-            if (creep.store[resource_type] <= 0) {
-                creep.memory.working = null;
-                creep.memory.working_step = null;
-            }
+        if (task.step == 2) {
+            ret = this._transfer(creep, task.to, task.rt);
+        }
+
+        if (ret == 0 && creep.store[task.rt] <= 0) {
+            task = null;
+        }
+    },
+
+    _task_pickup: function (creep) {
+        var task = creep.memory.task;
+        var ret;
+
+        if (task.step <= 1) {
+            ret = this._pickup(creep, task.from, task.rt);
+        }
+
+        if (ret == 0 && creep.store[task.rt] > 0) {
+            task.step = 2;
+        }
+
+        if (task.step == 2) {
+            ret = this._transfer(creep, task.to, task.rt);
+        }
+
+        if (ret == 0 && creep.store[task.rt] <= 0) {
+            task = null;
         }
     },
 }
-module.exports = task;
+module.exports = TASK;

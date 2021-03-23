@@ -43,14 +43,12 @@ var roleWorker = {
         if (!creep.memory.working) {
             this[creep.memory.role].arrange_work(creep); // 跑两遍 不发呆
             if (creep.memory.working) {
-                if (creep.memory.working == 'carry'
-                    || creep.memory.working == 'pickup') {
-                    TASK[creep.memory.working](creep);
-                }
-                else {
-                    work[creep.memory.working](creep);
-                }
+                work[creep.memory.working](creep);
             }
+        }
+
+        if (creep.memory.task) {
+            TASK.execute(creep);
         }
     },
 
@@ -1113,13 +1111,10 @@ var roleWorker = {
                         role: WORKER_ROLE.CARRIER,
                         base: base.name,
                         group: 0,
-                        working: null,
-                        working_step: null,
-                        working_from: null,
-                        working_to: null,
-                        working_resource: null,
                         base_room: base.room.name,
                         working_room: working_room,
+                        working: 'carry',
+                        task: null,
                     }
                 });
 
@@ -1129,7 +1124,7 @@ var roleWorker = {
             }
         },
 
-        arrange_work: function (creep) { // transfer
+        arrange_work: function (creep) { // carrier
             //var creep = Game.creeps[icreep.name];
             //var creep_base = Game.spawns[creep.memory.base];
             var creep_working_room = Game.rooms[creep.memory.working_room];
@@ -1141,71 +1136,59 @@ var roleWorker = {
             var terminal_memory = Memory.rooms[creep.memory.working_room].terminal;
             var terminal = Game.getObjectById(terminal_memory.id);
 
-            if (!creep.memory.working) {//如果没有工作，或者工作已经完成， 则分配工作
-                creep.memory.working = null;
-                creep.memory.working_setp = null;
-                creep.memory.working_from = null;
-                creep.memory.working_to = null;
-                creep.memory.working_resource = null;
+            creep.memory.working = 'carry';
+
+            if (creep.memory.task
+                && !creep.memory.task.action) {//如果没有工作，或者工作已经完成， 则分配工作
+                creep.memory.task = undefined;
             }
 
             // link -> storage
-            if (!creep.memory.working) {
+            if (!creep.memory.task) {//如果没有工作，或者工作已经完成， 则分配工作
                 for (let lid in Memory.links) {
                     let link_memory = Memory.links[lid];
                     if (link_memory['request'] == true && !link_memory['creep']) {
-                        creep.memory.working = 'carry';
-                        creep.memory.working_from = creep_base_room.storage.id;
-                        creep.memory.working_to = lid;
-                        creep.memory.working_resource = RESOURCE_ENERGY;
+                        creep.memory.task = TASK.assign('carry', creep_base_room.storage.id, lid, RESOURCE_ENERGY);
                         break;
                     }
                 }
             }
 
             // 从storage 搬到 terminal
-            if (!creep.memory.working) {
+            if (!creep.memory.task) {
                 for (let rs in terminal_memory.request) {
                     if (terminal_memory.request[rs] > terminal.store[rs]) {
-                        creep.memory.working = 'carry';
-                        creep.memory.working_from = creep_base_room.storage.id;
-                        creep.memory.working_to = terminal_memory.id;
-                        creep.memory.working_resource = rs;
+                        creep.memory.task = TASK.assign('carry', creep_base_room.storage.id, terminal_memory.id, rs);
                         break;
                     }
                 }
             }
 
             // 从terminal 搬到 storage
-            if (!creep.memory.working) {
+            if (!creep.memory.task) {
                 for (let rs in terminal_memory.back) {
                     if (terminal_memory.back[rs] > 0 && terminal.store[rs] > 0) {
-                        creep.memory.working = 'carry';
-                        creep.memory.working_from = terminal_memory.id;
-                        creep.memory.working_to = creep_base_room.storage.id;
-                        creep.memory.working_resource = rs;
+                        creep.memory.task = TASK.assign('carry', terminal_memory.id, creep_base_room.storage.id, rs);
                         break;
                     }
                 }
             }
 
-//             // Dropped resources
-//             if (!target) {
-//                 target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-//                     filter: (resource) => {
-//                         return resource.room.name == creep_working_room.name
-//                     }
-//                 });
-//                 if (target) {
-//                     creep.memory.working = 'pickup';
-//                     creep.memory.working_from = target.id;
-//                     creep.memory.working_to = creep_base_room.storage.id;
-//                     creep.memory.working_resource = target.resourceType;
-//                 }
-//             }
+            // Dropped resources
+            if (!creep.memory.task) {
+                target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+                    filter: (resource) => {
+                        return resource.room.name == creep_working_room.name
+                            && resource.amount > 0
+                    }
+                });
+                if (target) {
+                    creep.memory.task = TASK.assign('pickup', target.id, creep_base_room.storage.id, target.resourceType);
+                }
+            }
 
             // tombstones
-            if (!target) {
+            if (!creep.memory.task) {
                 target = creep.pos.findClosestByRange(FIND_TOMBSTONES, {
                     filter: (struct) => {
                         return struct.room.name == creep_working_room.name
@@ -1214,17 +1197,14 @@ var roleWorker = {
                 });
                 if (target) {
                     for (let rs in target.store) {
-                        creep.memory.working = 'carry';
-                        creep.memory.working_from = target.id;
-                        creep.memory.working_to = creep_base_room.storage.id;
-                        creep.memory.working_resource = rs;
+                        creep.memory.task = TASK.assign('carry', target.id, creep_base_room.storage.id, rs);
                         break;
                     }
                 }
             }
 
             // ruin
-            if (!target) {
+            if (!creep.memory.task) {
                 target = creep.pos.findClosestByRange(FIND_RUINS, {
                     filter: (struct) => {
                         return struct.room.name == creep_working_room.name
@@ -1233,17 +1213,14 @@ var roleWorker = {
                 });
                 if (target) {
                     for (let rs in target.store) {
-                        creep.memory.working = 'carry';
-                        creep.memory.working_from = target.id;
-                        creep.memory.working_to = creep_base_room.storage.id;
-                        creep.memory.working_resource = rs;
+                        creep.memory.task = TASK.assign('carry', target.id, creep_base_room.storage.id, rs);
                         break;
                     }
                 }
             }
 
             // container
-            if (!target) {
+            if (!creep.memory.task) {
                 target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                     filter: (struct) => struct.structureType == STRUCTURE_CONTAINER
                         && struct.room.name == creep_working_room.name
@@ -1251,10 +1228,7 @@ var roleWorker = {
                 });
                 if (target) {
                     for (let rs in target.store) {
-                        creep.memory.working = 'carry';
-                        creep.memory.working_from = target.id;
-                        creep.memory.working_to = creep_base_room.storage.id;
-                        creep.memory.working_resource = rs;
+                        creep.memory.task = TASK.assign('carry', target.id, creep_base_room.storage.id, rs);
                         break;
                     }
                 }

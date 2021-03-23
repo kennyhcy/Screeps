@@ -82,7 +82,7 @@ var baseTower = {
                 filter: (structure) => {
                     return (structure.structureType == STRUCTURE_WALL
                     ) && structure.hits < structure.hitsMax
-                        && structure.hits < 100000
+                        && structure.hits < 10000
                 }
             });
         };
