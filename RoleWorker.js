@@ -1198,7 +1198,7 @@ var roleWorker = {
                 });
                 if (target) {
                     creep.memory.working = 'pickup';
-                    creep.memory.working_target = target.id;
+                    creep.memory.working_from = target.id;
                     creep.memory.working_to = creep_base_room.storage.id;
                     creep.memory.working_resource = target.resourceType;
                 }
