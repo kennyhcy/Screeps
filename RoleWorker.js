@@ -1189,20 +1189,20 @@ var roleWorker = {
                 }
             }
 
-            // Dropped resources
-            if (!target) {
-                target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
-                    filter: (resource) => {
-                        return resource.room.name == creep_working_room.name
-                    }
-                });
-                if (target) {
-                    creep.memory.working = 'pickup';
-                    creep.memory.working_from = target.id;
-                    creep.memory.working_to = creep_base_room.storage.id;
-                    creep.memory.working_resource = target.resourceType;
-                }
-            }
+//             // Dropped resources
+//             if (!target) {
+//                 target = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+//                     filter: (resource) => {
+//                         return resource.room.name == creep_working_room.name
+//                     }
+//                 });
+//                 if (target) {
+//                     creep.memory.working = 'pickup';
+//                     creep.memory.working_from = target.id;
+//                     creep.memory.working_to = creep_base_room.storage.id;
+//                     creep.memory.working_resource = target.resourceType;
+//                 }
+//             }
 
             // tombstones
             if (!target) {
